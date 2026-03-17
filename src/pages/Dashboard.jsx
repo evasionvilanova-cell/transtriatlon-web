@@ -610,9 +610,8 @@ export default function Dashboard() {
                       placeholder="Ej: Travessia d'Hivern" />
                   </div>
                   <div className="d-field">
-                    <label>Fecha (texto, ej: Enero 2026)</label>
-                    <input type="text" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                      placeholder="Ej: 15 Enero 2026" />
+                    <label>Fecha del evento</label>
+                    <input type="date" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} />
                   </div>
                 </div>
                 <div className="d-field">
