@@ -4,6 +4,7 @@ import Athletes from "./pages/Athletes.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Inscripcion from "./pages/Inscripcion.jsx";
 import TransEventos from "./pages/TransEventos.jsx";
+import Contacto from "./pages/Contacto.jsx";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/inscripcion" element={<Inscripcion />} />
       <Route path="/eventos" element={<TransEventos />} />
+      <Route path="/contacto" element={<Contacto />} />
     </Routes>
   );
 }
