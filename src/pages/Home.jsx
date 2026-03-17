@@ -222,6 +222,15 @@ export default function Home() {
 
   const go = (id) => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); setMenu(false); };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const d = new Date(dateStr + "T00:00:00");
+      return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+    }
+    return dateStr;
+  };
+
   return (
     <div>
       <style>{`
@@ -471,7 +480,7 @@ a{text-decoration:none;color:inherit}
                     <div className="ev-info">
                       <div className="ev-type">{e.type}</div>
                       <h3>{e.title}</h3>
-                      <div className="ev-date">{e.date}</div>
+                      <div className="ev-date">{formatDate(e.date)}</div>
                     </div>
                   </div>
                 </Link>
