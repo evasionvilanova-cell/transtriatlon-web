@@ -857,7 +857,11 @@ export default function Dashboard() {
                         {m.email}{m.movil ? ` · ${m.movil}` : ""}{m.asunto ? ` · ${m.asunto}` : ""}
                       </p>
                     </div>
-                    <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteMensaje(m)}>Eliminar</button>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <a href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.asunto || "Consulta Transtriatlon")}&body=${encodeURIComponent(`Hola ${m.nombre},\n\nGracias por contactar con Transtriatlon.\n\n---\nTu mensaje:\n${m.mensaje}\n`)}`}
+                        className="d-btn d-btn-sm" style={{ textDecoration: "none" }}>✉️ Responder</a>
+                      <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteMensaje(m)}>Eliminar</button>
+                    </div>
                   </div>
                   <div style={{ marginTop: 14, padding: 16, borderRadius: 8, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)", fontSize: 14, color: "rgba(255,255,255,.6)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
                     {m.mensaje}
