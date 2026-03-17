@@ -14,6 +14,7 @@ export default function Athletes() {
   const [ritmos, setRitmos] = useState([]);
   const [licencias, setLicencias] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedTemp, setSelectedTemp] = useState("all");
 
   // Check if already authenticated in session
   useEffect(() => {
@@ -206,7 +207,7 @@ export default function Athletes() {
 
           {/* Training cards */}
           <div className="ath-trainings" id="trainings">
-            <h2>ENTRENAMIENTOS SEMANALES</h2>
+            <h2>ENTRENAMIENTOS</h2>
             {loading ? (
               <div className="ath-loading">
                 <div className="spinner" />
@@ -215,23 +216,48 @@ export default function Athletes() {
             ) : trainings.length === 0 ? (
               <div className="ath-empty">No hay entrenamientos disponibles todavía.</div>
             ) : (
-              trainings.map((t) => (
-                <div key={t.id} className={`ath-week ${isCurrentWeek(t.weekStart) ? "current" : ""}`}>
-                  <div className="ath-week-info">
-                    {isCurrentWeek(t.weekStart) && <div className="ath-week-label">Semana actual</div>}
-                    <div className="ath-week-date">{formatWeek(t.weekStart)}</div>
-                    {t.title && <div className="ath-week-title">{t.title}</div>}
-                    <div className="ath-week-tags">
-                      {(t.categories || []).map((c) => <span key={c} className="ath-week-tag">{c}</span>)}
-                    </div>
-                  </div>
-                  {t.pdfUrl && (
-                    <a href={t.pdfUrl} target="_blank" rel="noreferrer" className="ath-dl">
-                      📄 Descargar PDF
-                    </a>
-                  )}
+              <>
+                {/* Temporada tabs */}
+                <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+                  <button onClick={() => setSelectedTemp("all")} style={{
+                    padding: "8px 18px", borderRadius: 100, border: "1px solid rgba(255,255,255,.1)",
+                    background: selectedTemp === "all" ? "var(--red)" : "transparent",
+                    color: selectedTemp === "all" ? "#fff" : "rgba(255,255,255,.4)",
+                    fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font)", transition: "all .2s",
+                  }}>Todos</button>
+                  {[...new Set(trainings.map(t => t.temporada).filter(Boolean))].sort().reverse().map(temp => (
+                    <button key={temp} onClick={() => setSelectedTemp(temp)} style={{
+                      padding: "8px 18px", borderRadius: 100, border: "1px solid rgba(255,255,255,.1)",
+                      background: selectedTemp === temp ? "var(--red)" : "transparent",
+                      color: selectedTemp === temp ? "#fff" : "rgba(255,255,255,.4)",
+                      fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font)", transition: "all .2s",
+                    }}>{temp}</button>
+                  ))}
                 </div>
-              ))
+
+                {/* Filtered trainings */}
+                {trainings.filter(t => selectedTemp === "all" || t.temporada === selectedTemp).map((t) => (
+                  <div key={t.id} className={`ath-week ${isCurrentWeek(t.weekStart) ? "current" : ""}`}>
+                    <div className="ath-week-info">
+                      {isCurrentWeek(t.weekStart) && <div className="ath-week-label">Semana actual</div>}
+                      {t.weekStart && <div className="ath-week-date">{formatWeek(t.weekStart)}</div>}
+                      {t.title && <div className="ath-week-title">{t.title}</div>}
+                      <div className="ath-week-tags">
+                        {t.temporada && <span className="ath-week-tag">📅 {t.temporada}</span>}
+                        {(t.categories || []).map((c) => <span key={c} className="ath-week-tag">{c}</span>)}
+                      </div>
+                    </div>
+                    {t.pdfUrl && (
+                      <a href={t.pdfUrl} target="_blank" rel="noreferrer" className="ath-dl">
+                        📄 Descargar PDF
+                      </a>
+                    )}
+                  </div>
+                ))}
+                {trainings.filter(t => selectedTemp === "all" || t.temporada === selectedTemp).length === 0 && (
+                  <div className="ath-empty">No hay entrenamientos para esta temporada.</div>
+                )}
+              </>
             )}
           </div>
 
