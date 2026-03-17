@@ -645,7 +645,7 @@ a{text-decoration:none;color:inherit}
         </div>
         <div className="ftr-bottom">
           <span>© 2026 Transtriatlon. Todos los derechos reservados.</span>
-          <Link to="/dashboard" style={{ color: "rgba(255,255,255,.3)", fontSize: 11, textDecoration: "none", padding: "4px 12px", borderRadius: 100, border: "1px solid rgba(255,255,255,.1)" }}>🔒 Dashboard</Link>
+          <Link to="/dashboard" style={{ color: "#fff", fontSize: 13, textDecoration: "none", padding: "8px 20px", borderRadius: 100, border: "1px solid rgba(255,255,255,.25)", fontWeight: 600 }}>🔒 Dashboard</Link>
           <span>📍 Vilanova i la Geltrú, Barcelona</span>
         </div>
       </footer>
