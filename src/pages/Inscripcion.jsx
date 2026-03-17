@@ -55,11 +55,11 @@ export default function Inscripcion() {
 
   if (sent) {
     return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #fef2f2 0%, #fff 40%, #fafaf8 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ minHeight: "100vh", background: "var(--dark)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <div style={{ textAlign: "center", maxWidth: 480 }}>
           <div style={{ fontSize: 64, marginBottom: 20 }}>✅</div>
-          <h1 style={{ fontFamily: "var(--display)", fontSize: 42, letterSpacing: 2, marginBottom: 12, color: "var(--text)" }}>¡INSCRIPCIÓN ENVIADA!</h1>
-          <p style={{ color: "var(--text2)", fontSize: 15, lineHeight: 1.7, marginBottom: 32 }}>
+          <h1 style={{ fontFamily: "var(--display)", fontSize: 42, letterSpacing: 2, marginBottom: 12, color: "#fff" }}>¡INSCRIPCIÓN ENVIADA!</h1>
+          <p style={{ color: "rgba(255,255,255,.45)", fontSize: 15, lineHeight: 1.7, marginBottom: 32 }}>
             Tu solicitud ha sido enviada correctamente. El equipo de Transtriatlon se pondrá en contacto contigo pronto.
           </p>
           <Link to="/" style={{ padding: "14px 32px", borderRadius: 100, background: "var(--red)", color: "#fff", fontSize: 14, fontWeight: 600, textDecoration: "none" }}>
@@ -71,70 +71,70 @@ export default function Inscripcion() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #fef2f2 0%, #fff 40%, #fafaf8 100%)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--dark)", color: "var(--white)" }}>
       <style>{`
-        .i-hdr{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(16px);padding:16px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,.06)}
+        .i-hdr{position:sticky;top:0;z-index:50;background:rgba(11,10,9,.94);backdrop-filter:blur(16px);padding:16px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
         .i-hdr-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-        .i-hdr-logo img{height:32px}
-        .i-hdr-logo span{font-family:var(--display);font-size:18px;letter-spacing:2px;color:var(--text)}
-        .i-back{padding:8px 18px;border-radius:100px;border:1px solid rgba(0,0,0,.1);color:var(--text2);font-size:12px;text-decoration:none;transition:all .2s}
-        .i-back:hover{border-color:var(--red);color:var(--red)}
+        .i-hdr-logo img{height:32px;filter:brightness(0) invert(1)}
+        .i-hdr-logo span{font-family:var(--display);font-size:18px;letter-spacing:2px;color:#fff}
+        .i-back{padding:8px 18px;border-radius:100px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:12px;text-decoration:none;transition:all .2s}
+        .i-back:hover{border-color:var(--red);color:var(--red-l)}
 
-        .i-hero{text-align:center;padding:clamp(40px,6vw,64px) 24px 0}
-        .i-hero h1{font-family:var(--display);font-size:clamp(36px,6vw,56px);letter-spacing:2px;color:var(--text)}
-        .i-hero p{color:var(--text2);font-size:15px;margin-top:8px;max-width:500px;margin-inline:auto}
+        .i-hero{text-align:center;padding:clamp(40px,6vw,64px) 24px 0;position:relative}
+        .i-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:radial-gradient(ellipse 60% 80% at 50% 0%,rgba(232,30,30,.08) 0%,transparent 70%)}
+        .i-hero h1{font-family:var(--display);font-size:clamp(36px,6vw,56px);letter-spacing:2px;position:relative}
+        .i-hero p{color:rgba(255,255,255,.4);font-size:15px;margin-top:8px;max-width:500px;margin-inline:auto;position:relative}
 
-        .i-layout{display:grid;grid-template-columns:1fr 400px;gap:48px;max-width:1140px;margin:0 auto;padding:48px clamp(16px,4vw,48px) 80px;align-items:start}
+        .i-layout{display:grid;grid-template-columns:1fr 380px;gap:40px;max-width:1140px;margin:0 auto;padding:48px clamp(16px,4vw,48px) 80px;align-items:start}
 
-        .i-form{padding:40px;border-radius:20px;background:#fff;box-shadow:0 4px 40px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06)}
+        .i-form{padding:36px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(8px)}
         .i-section{margin-bottom:28px}
-        .i-section h3{font-family:var(--display);font-size:18px;letter-spacing:1.5px;color:var(--red);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,.06)}
+        .i-section h3{font-family:var(--display);font-size:18px;letter-spacing:1.5px;color:var(--red);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
         .i-field{margin-bottom:14px}
-        .i-field label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:5px}
+        .i-field label{display:block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:5px}
         .i-field .req{color:var(--red)}
-        .i-field input,.i-field select,.i-field textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(0,0,0,.1);background:#fafaf8;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border .25s}
-        .i-field input:focus,.i-field select:focus,.i-field textarea:focus{border-color:var(--red);background:#fff}
-        .i-field select option{background:#fff;color:var(--text)}
+        .i-field input,.i-field select,.i-field textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-family:var(--font);outline:none;transition:border .25s}
+        .i-field input:focus,.i-field select:focus,.i-field textarea:focus{border-color:var(--red)}
+        .i-field select option{background:#1a1a1a;color:#fff}
         .i-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
         .i-radio-group{display:flex;gap:10px;flex-wrap:wrap}
-        .i-radio{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:#fafaf8;cursor:pointer;transition:all .25s;font-size:14px;color:var(--text)}
-        .i-radio:hover{border-color:rgba(0,0,0,.15)}
-        .i-radio.sel{border-color:var(--red);background:rgba(232,30,30,.04);color:var(--red)}
+        .i-radio{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:all .25s;font-size:14px;color:rgba(255,255,255,.6)}
+        .i-radio:hover{border-color:rgba(255,255,255,.15)}
+        .i-radio.sel{border-color:var(--red);background:rgba(232,30,30,.1);color:var(--red-l)}
         .i-radio input{display:none}
 
-        .i-check{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:#fafaf8;cursor:pointer;transition:all .25s}
-        .i-check:hover{border-color:rgba(0,0,0,.15)}
-        .i-check.sel{border-color:var(--red);background:rgba(232,30,30,.04)}
-        .i-check-box{width:20px;height:20px;border-radius:6px;border:2px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;transition:all .25s}
+        .i-check{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:all .25s}
+        .i-check:hover{border-color:rgba(255,255,255,.15)}
+        .i-check.sel{border-color:var(--red);background:rgba(232,30,30,.08)}
+        .i-check-box{width:20px;height:20px;border-radius:6px;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;transition:all .25s}
         .i-check.sel .i-check-box{background:var(--red);border-color:var(--red);color:#fff}
-        .i-check p{font-size:12px;color:var(--text2);line-height:1.5}
-        .i-check p a{color:var(--red)}
+        .i-check p{font-size:12px;color:rgba(255,255,255,.4);line-height:1.5}
+        .i-check p a{color:var(--red-l)}
 
         .i-submit{width:100%;padding:16px;border-radius:12px;background:var(--red);color:#fff;font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:var(--font);transition:all .25s;letter-spacing:.5px}
         .i-submit:hover{background:var(--red-l);transform:translateY(-1px);box-shadow:0 8px 24px var(--red-glow)}
         .i-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
-        .i-error{color:var(--red);font-size:13px;margin-top:10px;text-align:center}
+        .i-error{color:var(--red-l);font-size:13px;margin-top:10px;text-align:center}
 
-        /* FAQ sidebar */
         .i-faq{position:sticky;top:100px}
-        .i-faq h2{font-family:var(--display);font-size:26px;letter-spacing:2px;margin-bottom:20px;color:var(--text)}
-        .i-faq-item{margin-bottom:10px;border-radius:14px;border:1px solid rgba(0,0,0,.06);background:#fff;overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:0 2px 12px rgba(0,0,0,.02)}
-        .i-faq-item:hover{box-shadow:0 4px 20px rgba(0,0,0,.05)}
-        .i-faq-item.open{border-color:rgba(232,30,30,.15);box-shadow:0 4px 20px rgba(232,30,30,.06)}
+        .i-faq h2{font-family:var(--display);font-size:26px;letter-spacing:2px;margin-bottom:20px}
+        .i-faq-item{margin-bottom:10px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);overflow:hidden;cursor:pointer;transition:all .3s}
+        .i-faq-item:hover{background:rgba(255,255,255,.05)}
+        .i-faq-item.open{border-color:rgba(232,30,30,.2);background:rgba(232,30,30,.05)}
         .i-faq-q{display:flex;align-items:center;gap:12px;padding:16px 18px}
         .i-faq-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:all .3s}
-        .i-faq-num.closed{background:rgba(0,0,0,.04);color:var(--text2)}
+        .i-faq-num.closed{background:rgba(255,255,255,.06);color:rgba(255,255,255,.35)}
         .i-faq-num.opened{background:var(--red);color:#fff}
-        .i-faq-q span{flex:1;font-size:14px;font-weight:600;color:var(--text)}
-        .i-faq-q .plus{font-size:18px;color:var(--text2);transition:transform .3s}
+        .i-faq-q span{flex:1;font-size:14px;font-weight:600}
+        .i-faq-q .plus{font-size:18px;color:rgba(255,255,255,.3);transition:transform .3s}
         .i-faq-q .plus.open{transform:rotate(45deg);color:var(--red)}
-        .i-faq-a{padding:0 18px 16px 60px;font-size:13px;line-height:1.7;color:var(--text2)}
+        .i-faq-a{padding:0 18px 16px 60px;font-size:13px;line-height:1.7;color:rgba(255,255,255,.45)}
 
-        .i-contact{margin-top:28px;padding:24px;border-radius:14px;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:0 2px 12px rgba(0,0,0,.02)}
-        .i-contact h3{font-family:var(--display);font-size:18px;letter-spacing:1.5px;margin-bottom:12px;color:var(--text)}
-        .i-contact p{font-size:13px;color:var(--text2);line-height:1.6}
-        .i-contact a{color:var(--red);font-weight:600;text-decoration:none}
+        .i-contact{margin-top:24px;padding:24px;border-radius:14px;background:rgba(232,30,30,.05);border:1px solid rgba(232,30,30,.1)}
+        .i-contact h3{font-family:var(--display);font-size:18px;letter-spacing:1.5px;margin-bottom:12px}
+        .i-contact p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.6}
+        .i-contact a{color:var(--red-l);font-weight:600;text-decoration:none}
 
         @media(max-width:860px){
           .i-layout{grid-template-columns:1fr}
@@ -154,7 +154,6 @@ export default function Inscripcion() {
       </div>
 
       <div className="i-layout">
-        {/* FORM */}
         <div className="i-form">
           <div className="i-section">
             <h3>DATOS PERSONALES</h3>
@@ -226,20 +225,12 @@ export default function Inscripcion() {
           {error && <div className="i-error">{error}</div>}
         </div>
 
-        {/* FAQ SIDEBAR */}
         <div className="i-faq">
           <h2>PREGUNTAS FRECUENTES</h2>
-          {FAQS.map((faq, i) => (
-            <FaqItem key={i} num={i + 1} q={faq.q} a={faq.a} />
-          ))}
-
+          {FAQS.map((faq, i) => <FaqItem key={i} num={i + 1} q={faq.q} a={faq.a} />)}
           <div className="i-contact">
             <h3>¿TIENES DUDAS?</h3>
-            <p>
-              Contacta con nosotros:<br />
-              <a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a><br />
-              <a href="tel:683542061">683 542 061</a> (Nico Saenz)
-            </p>
+            <p>Contacta con nosotros:<br /><a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a><br /><a href="tel:683542061">683 542 061</a> (Nico Saenz)</p>
           </div>
         </div>
       </div>
