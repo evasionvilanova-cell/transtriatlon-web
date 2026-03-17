@@ -26,6 +26,9 @@ export default function TransEventos() {
 
   const parseDate = (dateStr) => {
     if (!dateStr) return null;
+    // Handle ISO format: 2025-12-28
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return new Date(dateStr + "T00:00:00");
+    // Handle text format
     const months = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setembre:8,octubre:9,noviembre:10,diciembre:11 };
     const parts = dateStr.toLowerCase().replace(/de /g, "").trim().split(/\s+/);
     for (const [name, idx] of Object.entries(months)) {
@@ -39,7 +42,17 @@ export default function TransEventos() {
     return null;
   };
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const d = new Date(dateStr + "T00:00:00");
+      return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+    }
+    return dateStr;
+  };
+
   const now = new Date();
+  now.setHours(0,0,0,0);
   const upcoming = events.filter(e => { const d = parseDate(e.date); return !d || d >= now; });
   const past = events.filter(e => { const d = parseDate(e.date); return d && d < now; }).reverse();
 
@@ -128,7 +141,7 @@ export default function TransEventos() {
                         </div>
                         <div className="te-card-body">
                           <h3>{ev.title}</h3>
-                          <div className="date">{ev.date}</div>
+                          <div className="date">{formatDate(ev.date)}</div>
                         </div>
                       </div>
                     ))}
@@ -150,7 +163,7 @@ export default function TransEventos() {
                         </div>
                         <div className="te-card-body">
                           <h3>{ev.title}</h3>
-                          <div className="date">{ev.date}</div>
+                          <div className="date">{formatDate(ev.date)}</div>
                         </div>
                       </div>
                     ))}
@@ -174,7 +187,7 @@ export default function TransEventos() {
             <h1>{selected.title}</h1>
             <div className="te-detail-meta">
               <span className="te-detail-tag type">{selected.type}</span>
-              <span className="te-detail-tag date">{selected.date}</span>
+              <span className="te-detail-tag date">{formatDate(selected.date)}</span>
             </div>
 
             {selected.description && (
