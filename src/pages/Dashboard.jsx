@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   // Events state
   const [events, setEvents] = useState([]);
-  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "" });
+  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "" });
   const [uploadingImg, setUploadingImg] = useState(false);
 
   // Ritmos state
@@ -152,31 +152,27 @@ export default function Dashboard() {
 
   // ── EVENTS ──
   const uploadImage = async (file) => {
+    if (file.size > 800000) { setMsg("❌ Imagen demasiado grande. Máximo 800KB. Reduce el tamaño."); return; }
     setUploadingImg(true);
     try {
-      const formData = new FormData();
-      formData.append("image", file);
-      const res = await fetch("https://api.imgbb.com/1/upload?key=00c9de449d6b4e5f2e6e4b8e0c6a1f3d", {
-        method: "POST", body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        setNewEvent(prev => ({ ...prev, imgUrl: data.data.url }));
-        setMsg("✅ Imagen subida correctamente!");
-      } else {
-        setMsg("❌ Error al subir imagen. Intenta de nuevo o pega una URL.");
-      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setNewEvent(prev => ({ ...prev, imgUrl: reader.result }));
+        setMsg("✅ Imagen cargada!");
+        setUploadingImg(false);
+      };
+      reader.readAsDataURL(file);
     } catch (e) {
       setMsg("❌ Error: " + e.message);
+      setUploadingImg(false);
     }
-    setUploadingImg(false);
   };
 
   const addEvent = async () => {
     if (!newEvent.title) { setMsg("El evento necesita un título"); return; }
     try {
       await addDoc(collection(db, "events"), newEvent);
-      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "" });
+      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "" });
       setMsg("✅ Evento añadido!");
       loadEvents();
     } catch (e) { setMsg("Error: " + e.message); }
@@ -621,6 +617,23 @@ export default function Dashboard() {
                       <img src={newEvent.imgUrl} alt="Preview" style={{ width: "100%", height: "auto", display: "block" }} />
                     </div>
                   )}
+                </div>
+                <div className="d-field">
+                  <label>Descripción del evento</label>
+                  <textarea value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                    placeholder="Describe el evento: recorrido, categorías, horarios..." style={{ minHeight: 100 }} />
+                </div>
+                <div className="d-row">
+                  <div className="d-field">
+                    <label>Enlace reglamento (PDF Google Drive)</label>
+                    <input type="url" value={newEvent.reglamentoUrl} onChange={(e) => setNewEvent({ ...newEvent, reglamentoUrl: e.target.value })}
+                      placeholder="https://drive.google.com/..." />
+                  </div>
+                  <div className="d-field">
+                    <label>Enlace inscripción al evento</label>
+                    <input type="url" value={newEvent.inscripcionUrl} onChange={(e) => setNewEvent({ ...newEvent, inscripcionUrl: e.target.value })}
+                      placeholder="https://..." />
+                  </div>
                 </div>
                 <button className="d-btn" onClick={addEvent}>➕ Añadir Evento</button>
               </div>
