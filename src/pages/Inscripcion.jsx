@@ -230,7 +230,62 @@ export default function Inscripcion() {
           {sending ? "Enviando..." : "ENVIAR INSCRIPCIÓN"}
         </button>
         {error && <div className="ins-error">{error}</div>}
+
+        {/* FAQ */}
+        <div style={{ marginTop: 64, paddingTop: 48, borderTop: "1px solid rgba(255,255,255,.08)" }}>
+          <h2 style={{ fontFamily: "var(--display)", fontSize: 32, letterSpacing: 2, marginBottom: 24 }}>PREGUNTAS FRECUENTES</h2>
+          {[
+            {
+              q: "¿Cómo me hago socio de Transtriatlon?",
+              a: "Es muy sencillo, tan sólo debes rellenar este formulario con todos tus datos y en breve recibirás respuesta."
+            },
+            {
+              q: "¿Se realizan entrenamientos personalizados?",
+              a: "Sí, los entrenamientos dirigidos en grupo son personalizados a cada disciplina o tratando todas a la vez. Según el número de participantes en el entrenamiento, el club posee un equipo técnico que llevará cada grupo de nivel para así no retrasar a los más avanzados y no ahogar a los más retrasados."
+            },
+            {
+              q: "¿Se hace larga distancia o corta distancia?",
+              a: "Los entrenamientos son variados y todos los atletas podrán optar a unos planes de entrenamiento según su disciplina. En los grupales los atletas entrenan por nivel."
+            },
+            {
+              q: "¿Dónde se realizan los entrenamientos específicos de natación?",
+              a: "Los entrenamientos de natación se realizan en el Complejo Esportiu La Piscina."
+            },
+          ].map((faq, i) => (
+            <FaqItem key={i} num={i + 1} q={faq.q} a={faq.a} />
+          ))}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function FaqItem({ num, q, a }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div onClick={() => setOpen(!open)} style={{
+      marginBottom: 10, borderRadius: 12, border: "1px solid rgba(255,255,255,.08)",
+      background: open ? "rgba(232,30,30,.04)" : "rgba(255,255,255,.03)",
+      cursor: "pointer", transition: "all .3s", overflow: "hidden",
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center", gap: 14, padding: "16px 20px",
+      }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8, background: open ? "var(--red)" : "rgba(255,255,255,.08)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 700, color: open ? "#fff" : "rgba(255,255,255,.4)",
+          flexShrink: 0, transition: "all .3s",
+        }}>{num}</div>
+        <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{q}</span>
+        <span style={{ fontSize: 18, color: "rgba(255,255,255,.3)", transition: "transform .3s", transform: open ? "rotate(45deg)" : "rotate(0)" }}>+</span>
+      </div>
+      {open && (
+        <div style={{
+          padding: "0 20px 18px 66px", fontSize: 14, lineHeight: 1.7,
+          color: "rgba(255,255,255,.5)",
+        }}>{a}</div>
+      )}
     </div>
   );
 }
