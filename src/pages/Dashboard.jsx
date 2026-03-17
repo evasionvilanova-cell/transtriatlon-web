@@ -32,6 +32,14 @@ export default function Dashboard() {
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "" });
 
+  // Ritmos state
+  const [ritmos, setRitmos] = useState([]);
+  const [newRitmo, setNewRitmo] = useState({ title: "", pdfUrl: "" });
+
+  // Licencias state
+  const [licencias, setLicencias] = useState([]);
+  const [newLicencia, setNewLicencia] = useState({ title: "", pdfUrl: "" });
+
   useEffect(() => {
     const saved = sessionStorage.getItem("tt-coach-auth");
     if (saved === "true") setAuth(true);
@@ -53,6 +61,8 @@ export default function Dashboard() {
     loadAthleteCode();
     loadBanner();
     loadEvents();
+    loadRitmos();
+    loadLicencias();
   }, [auth]);
 
   const loadTrainings = async () => {
@@ -146,6 +156,58 @@ export default function Dashboard() {
     try {
       await deleteDoc(doc(db, "events", ev.id));
       setMsg("Evento eliminado"); loadEvents();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  // ── RITMOS ──
+  const loadRitmos = async () => {
+    try {
+      const q = query(collection(db, "ritmos"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      setRitmos(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) { console.error(e); }
+  };
+
+  const addRitmo = async () => {
+    if (!newRitmo.title || !newRitmo.pdfUrl) { setMsg("Título y enlace del PDF son obligatorios"); return; }
+    try {
+      await addDoc(collection(db, "ritmos"), { ...newRitmo, createdAt: serverTimestamp() });
+      setNewRitmo({ title: "", pdfUrl: "" });
+      setMsg("✅ Ritmo añadido!"); loadRitmos();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const deleteRitmo = async (r) => {
+    if (!confirm(`¿Eliminar "${r.title}"?`)) return;
+    try {
+      await deleteDoc(doc(db, "ritmos", r.id));
+      setMsg("Ritmo eliminado"); loadRitmos();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  // ── LICENCIAS ──
+  const loadLicencias = async () => {
+    try {
+      const q = query(collection(db, "licencias"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      setLicencias(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) { console.error(e); }
+  };
+
+  const addLicencia = async () => {
+    if (!newLicencia.title || !newLicencia.pdfUrl) { setMsg("Título y enlace del PDF son obligatorios"); return; }
+    try {
+      await addDoc(collection(db, "licencias"), { ...newLicencia, createdAt: serverTimestamp() });
+      setNewLicencia({ title: "", pdfUrl: "" });
+      setMsg("✅ Documento de licencia añadido!"); loadLicencias();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const deleteLicencia = async (l) => {
+    if (!confirm(`¿Eliminar "${l.title}"?`)) return;
+    try {
+      await deleteDoc(doc(db, "licencias", l.id));
+      setMsg("Documento eliminado"); loadLicencias();
     } catch (e) { setMsg("Error: " + e.message); }
   };
 
@@ -255,7 +317,7 @@ export default function Dashboard() {
 
       {/* Mobile tabs */}
       <div className="d-mob-tabs">
-        {[["trainings","🏋️ Entrenos"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"]].map(([id,label]) => (
+        {[["trainings","🏋️ Entrenos"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"],["ritmos","⏱️ Ritmos"],["licencias","📋 Licencias"]].map(([id,label]) => (
           <button key={id} className={`d-mob-tab ${tab===id?"ac":""}`} onClick={()=>setTab(id)}>{label}</button>
         ))}
       </div>
@@ -268,6 +330,8 @@ export default function Dashboard() {
             { id: "code", icon: "🔑", label: "Código Atletas" },
             { id: "banner", icon: "📢", label: "Banner" },
             { id: "events", icon: "🏆", label: "Eventos" },
+            { id: "ritmos", icon: "⏱️", label: "Ritmos" },
+            { id: "licencias", icon: "📋", label: "Licencias" },
           ].map(s => (
             <div key={s.id} className={`d-side-item ${tab === s.id ? "ac" : ""}`} onClick={() => setTab(s.id)}>
               <span>{s.icon}</span> {s.label}
@@ -446,6 +510,90 @@ export default function Dashboard() {
                     <p>{ev.date} · {ev.type}</p>
                   </div>
                   <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* ── RITMOS TAB ── */}
+          {tab === "ritmos" && (
+            <>
+              <div className="d-title">RITMOS</div>
+              <div className="d-subtitle">Sube tablas de ritmos y zonas de entreno en PDF para tus atletas</div>
+
+              <div className="d-card">
+                <h3>AÑADIR DOCUMENTO DE RITMOS</h3>
+                <div className="d-row">
+                  <div className="d-field">
+                    <label>Título</label>
+                    <input type="text" placeholder="Ej: Tabla de ritmos natación T1" value={newRitmo.title}
+                      onChange={(e) => setNewRitmo({ ...newRitmo, title: e.target.value })} />
+                  </div>
+                  <div className="d-field">
+                    <label>Enlace del PDF</label>
+                    <input type="url" placeholder="https://drive.google.com/file/d/..." value={newRitmo.pdfUrl}
+                      onChange={(e) => setNewRitmo({ ...newRitmo, pdfUrl: e.target.value })} />
+                  </div>
+                </div>
+                <button className="d-btn" onClick={addRitmo}>📤 Añadir Ritmo</button>
+              </div>
+
+              <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>
+                DOCUMENTOS DE RITMOS ({ritmos.length})
+              </h3>
+              {ritmos.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay documentos de ritmos todavía.</p>}
+              {ritmos.map(r => (
+                <div key={r.id} className="d-list-item">
+                  <div className="d-list-info">
+                    <h4>⏱️ {r.title}</h4>
+                    <p style={{ fontSize: 11, wordBreak: "break-all" }}>{r.pdfUrl}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <a href={r.pdfUrl} target="_blank" rel="noreferrer" className="d-btn d-btn-sm d-btn-ghost" style={{ textDecoration: "none" }}>Ver PDF</a>
+                    <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteRitmo(r)}>Eliminar</button>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* ── LICENCIAS TAB ── */}
+          {tab === "licencias" && (
+            <>
+              <div className="d-title">TRAMITACIÓN LICENCIAS</div>
+              <div className="d-subtitle">Sube documentos PDF sobre tramitación de licencias federativas para tus atletas</div>
+
+              <div className="d-card">
+                <h3>AÑADIR DOCUMENTO DE LICENCIA</h3>
+                <div className="d-row">
+                  <div className="d-field">
+                    <label>Título</label>
+                    <input type="text" placeholder="Ej: Formulario licencia federativa 2026" value={newLicencia.title}
+                      onChange={(e) => setNewLicencia({ ...newLicencia, title: e.target.value })} />
+                  </div>
+                  <div className="d-field">
+                    <label>Enlace del PDF</label>
+                    <input type="url" placeholder="https://drive.google.com/file/d/..." value={newLicencia.pdfUrl}
+                      onChange={(e) => setNewLicencia({ ...newLicencia, pdfUrl: e.target.value })} />
+                  </div>
+                </div>
+                <button className="d-btn" onClick={addLicencia}>📤 Añadir Documento</button>
+              </div>
+
+              <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>
+                DOCUMENTOS DE LICENCIAS ({licencias.length})
+              </h3>
+              {licencias.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay documentos de licencias todavía.</p>}
+              {licencias.map(l => (
+                <div key={l.id} className="d-list-item">
+                  <div className="d-list-info">
+                    <h4>📋 {l.title}</h4>
+                    <p style={{ fontSize: 11, wordBreak: "break-all" }}>{l.pdfUrl}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <a href={l.pdfUrl} target="_blank" rel="noreferrer" className="d-btn d-btn-sm d-btn-ghost" style={{ textDecoration: "none" }}>Ver PDF</a>
+                    <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteLicencia(l)}>Eliminar</button>
+                  </div>
                 </div>
               ))}
             </>
