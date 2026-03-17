@@ -400,6 +400,8 @@ a{text-decoration:none;color:inherit}
             <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
           )
         ))}
+        <li onClick={() => { setMenu(false); window.location.hash = "/atletas"; }}>Acceso Atletas</li>
+        <li onClick={() => { setMenu(false); window.location.hash = "/inscripcion"; }} style={{ color: "var(--red)" }}>Inscríbete</li>
       </ul>
 
       {/* ═══ BANNER ═══ */}
