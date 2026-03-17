@@ -646,12 +646,18 @@ export default function Dashboard() {
                 </div>
                 <div className="d-field">
                   <label>URL de la imagen del cartel</label>
-                  <input type="url" value={newEvent.imgUrl} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
-                    placeholder="https://..." />
+                  <input type="url" value={newEvent.imgUrl} onChange={(e) => {
+                    let url = e.target.value;
+                    const gdMatch = url.match(/\/file\/d\/([^/]+)/);
+                    if (gdMatch) url = `https://lh3.googleusercontent.com/d/${gdMatch[1]}`;
+                    if (url.includes("1drv.ms") || url.includes("onedrive.live.com")) {
+                      url = url.replace(/&e=.*$/, "").replace(/\?e=.*$/, "") + "?download=1";
+                    }
+                    setNewEvent({ ...newEvent, imgUrl: url });
+                  }}
+                    placeholder="Pega enlace de Google Drive, OneDrive o URL de imagen..." />
                   <p style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 6, lineHeight: 1.5 }}>
-                    Sube la imagen a Google Drive → clic derecho → Compartir → "Cualquier persona con el enlace" → Copia el enlace.<br />
-                    Luego cambia <code>/file/d/XXXX/view</code> por <code>/uc?id=XXXX&export=download</code> para que se vea directamente.<br />
-                    También puedes usar cualquier URL directa de imagen (terminada en .jpg o .png).
+                    Sube la imagen a Google Drive, OneDrive o cualquier servicio → Compartir → "Cualquier persona con el enlace" → Pega aquí. Se convierte automáticamente.
                   </p>
                   {newEvent.imgUrl && (
                     <div style={{ marginTop: 12, borderRadius: 10, overflow: "hidden", maxWidth: 200, border: "1px solid rgba(255,255,255,.1)" }}>
