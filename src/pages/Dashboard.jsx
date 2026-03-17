@@ -201,7 +201,8 @@ export default function Dashboard() {
 
         .d-field{margin-bottom:16px}
         .d-field label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
-        .d-field select option{background:#1a1a1a;color:#fff}         .d-field input,.d-field textarea,.d-field select{width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-family:var(--font);outline:none}
+        .d-field select option{background:#1a1a1a;color:#fff}
+        .d-field input,.d-field textarea,.d-field select{width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-family:var(--font);outline:none}
         .d-field input:focus,.d-field textarea:focus{border-color:var(--red)}
         .d-field textarea{min-height:80px;resize:vertical}
         .d-field input[type=file]{padding:10px;font-size:13px}
