@@ -444,7 +444,7 @@ a{text-decoration:none;color:inherit}
           </Reveal>
           <Reveal delay={0.1}>
             <h1 style={{ fontFamily: "var(--display)", fontSize: "clamp(48px,10vw,110px)", lineHeight: .9, letterSpacing: -1, color: "#fff" }}>
-              NADA. PEDALEA.<br /><span style={{ color: "var(--red)" }}>CORRE.</span>
+              SWIM. BIKE.<br /><span style={{ color: "var(--red)" }}>RUN.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
