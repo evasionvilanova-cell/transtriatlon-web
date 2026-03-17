@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [newTitle, setNewTitle] = useState("");
   const [newCats, setNewCats] = useState("Natación,Ciclismo,Carrera,Funcional");
   const [newPdfUrl, setNewPdfUrl] = useState("");
+  const [newTemporada, setNewTemporada] = useState("2025-2026");
   const [uploading, setUploading] = useState(false);
 
   // Athlete code state
@@ -111,14 +112,15 @@ export default function Dashboard() {
 
   // ── TRAININGS ──
   const uploadTraining = async () => {
-    if (!newWeek || !newPdfUrl) { setMsg("Selecciona semana y pega el enlace del PDF"); return; }
+    if (!newPdfUrl) { setMsg("Pega el enlace del PDF"); return; }
     setUploading(true); setMsg("");
     try {
       await addDoc(collection(db, "trainings"), {
-        weekStart: newWeek,
-        title: newTitle || `Semana ${newWeek}`,
+        weekStart: newWeek || "",
+        title: newTitle || `Entrenamiento ${newTemporada}`,
         categories: newCats.split(",").map(c => c.trim()).filter(Boolean),
         pdfUrl: newPdfUrl,
+        temporada: newTemporada,
         createdAt: serverTimestamp(),
       });
       setNewWeek(""); setNewTitle(""); setNewPdfUrl("");
@@ -487,17 +489,33 @@ export default function Dashboard() {
                 <h3>SUBIR NUEVO ENTRENAMIENTO</h3>
                 <div className="d-row">
                   <div className="d-field">
-                    <label>Semana (lunes de inicio)</label>
-                    <input type="date" value={newWeek} onChange={(e) => setNewWeek(e.target.value)} />
+                    <label>Temporada</label>
+                    <select value={newTemporada} onChange={(e) => setNewTemporada(e.target.value)}>
+                      <option>2025-2026</option>
+                      <option>2024-2025</option>
+                      <option>2023-2024</option>
+                      <option>2022-2023</option>
+                      <option>2021-2022</option>
+                      <option>2020-2021</option>
+                      <option>2019-2020</option>
+                      <option>2018-2019</option>
+                      <option>2017-2018</option>
+                    </select>
                   </div>
                   <div className="d-field">
-                    <label>Título (opcional)</label>
-                    <input type="text" placeholder="Ej: Semana de carga" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+                    <label>Semana (opcional)</label>
+                    <input type="date" value={newWeek} onChange={(e) => setNewWeek(e.target.value)} />
                   </div>
                 </div>
-                <div className="d-field">
-                  <label>Categorías (separadas por coma)</label>
-                  <input type="text" value={newCats} onChange={(e) => setNewCats(e.target.value)} />
+                <div className="d-row">
+                  <div className="d-field">
+                    <label>Título</label>
+                    <input type="text" placeholder="Ej: Entrenamientos 2025, Semana de carga..." value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+                  </div>
+                  <div className="d-field">
+                    <label>Categorías (separadas por coma)</label>
+                    <input type="text" value={newCats} onChange={(e) => setNewCats(e.target.value)} />
+                  </div>
                 </div>
                 <div className="d-field">
                   <label>Enlace del PDF (Google Drive, Dropbox, etc.)</label>
@@ -515,7 +533,7 @@ export default function Dashboard() {
                 <div key={t.id} className="d-list-item">
                   <div className="d-list-info">
                     <h4>{t.title}</h4>
-                    <p>Semana del {t.weekStart} · {(t.categories || []).join(", ")}</p>
+                    <p>{t.temporada ? `📅 ${t.temporada} · ` : ""}{t.weekStart ? `Semana del ${t.weekStart} · ` : ""}{(t.categories || []).join(", ")}</p>
                   </div>
                   <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteTraining(t)}>Eliminar</button>
                 </div>
