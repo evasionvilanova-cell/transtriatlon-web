@@ -453,16 +453,23 @@ a{text-decoration:none;color:inherit}
           <div className="ev-grid">
             {events.map((e, i) => (
               <Reveal key={e.title} delay={0.1 + i * 0.08}>
-                <div className="ev-card">
-                  <img src={e.img} alt={e.title} />
-                  <div className="ev-info">
-                    <div className="ev-type">{e.type}</div>
-                    <h3>{e.title}</h3>
-                    <div className="ev-date">{e.date}</div>
+                <Link to="/eventos" style={{ textDecoration: "none", color: "inherit" }}>
+                  <div className="ev-card">
+                    <img src={e.img} alt={e.title} />
+                    <div className="ev-info">
+                      <div className="ev-type">{e.type}</div>
+                      <h3>{e.title}</h3>
+                      <div className="ev-date">{e.date}</div>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </Reveal>
             ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <Link to="/eventos" style={{ padding: "12px 28px", borderRadius: 100, border: "1px solid rgba(0,0,0,.12)", color: "var(--text)", fontSize: 13, fontWeight: 600, textDecoration: "none", transition: "all .25s", display: "inline-block" }}>
+              Ver todos los eventos →
+            </Link>
           </div>
         </div>
       </section>
