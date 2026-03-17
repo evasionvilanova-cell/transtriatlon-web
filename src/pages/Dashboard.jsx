@@ -5,7 +5,6 @@ import { collection, query, orderBy, getDocs, doc, getDoc, setDoc, addDoc, delet
 import "../styles.css";
 
 const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
-const COACH_PASS = "transtriatlon2026"; // Change this!
 
 export default function Dashboard() {
   const [auth, setAuth] = useState(false);
@@ -59,12 +58,18 @@ export default function Dashboard() {
     if (saved === "true") setAuth(true);
   }, []);
 
-  const handleLogin = () => {
-    if (pass === COACH_PASS) {
-      setAuth(true);
-      sessionStorage.setItem("tt-coach-auth", "true");
-    } else {
-      setMsg("Contraseña incorrecta");
+  const handleLogin = async () => {
+    setMsg("");
+    try {
+      const snap = await getDoc(doc(db, "settings", "coachPassword"));
+      if (snap.exists() && snap.data().password === pass) {
+        setAuth(true);
+        sessionStorage.setItem("tt-coach-auth", "true");
+      } else {
+        setMsg("Contraseña incorrecta");
+      }
+    } catch (e) {
+      setMsg("Error de conexión. Inténtalo de nuevo.");
     }
   };
 
