@@ -30,8 +30,9 @@ export default function Dashboard() {
 
   // Events state
   const [events, setEvents] = useState([]);
-  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "" });
+  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" });
   const [uploadingImg, setUploadingImg] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
 
   // Ritmos state
   const [ritmos, setRitmos] = useState([]);
@@ -168,14 +169,38 @@ export default function Dashboard() {
     }
   };
 
-  const addEvent = async () => {
+  const saveEvent = async () => {
     if (!newEvent.title) { setMsg("El evento necesita un título"); return; }
     try {
-      await addDoc(collection(db, "events"), newEvent);
-      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "" });
-      setMsg("✅ Evento añadido!");
+      if (editingEvent) {
+        await setDoc(doc(db, "events", editingEvent.id), newEvent);
+        setEditingEvent(null);
+        setMsg("✅ Evento actualizado!");
+      } else {
+        await addDoc(collection(db, "events"), newEvent);
+        setMsg("✅ Evento añadido!");
+      }
+      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" });
       loadEvents();
     } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const startEditEvent = (ev) => {
+    setEditingEvent(ev);
+    setNewEvent({
+      title: ev.title || "", date: ev.date || "", type: ev.type || "Triatlón",
+      imgUrl: ev.imgUrl || "", description: ev.description || "",
+      reglamentoUrl: ev.reglamentoUrl || "", inscripcionUrl: ev.inscripcionUrl || "",
+      resultadosUrl: ev.resultadosUrl || "",
+    });
+    setMsg("Editando: " + ev.title);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingEvent(null);
+    setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" });
+    setMsg("");
   };
 
   const deleteEvent = async (ev) => {
@@ -571,10 +596,13 @@ export default function Dashboard() {
           {tab === "events" && (
             <>
               <div className="d-title">TRANSEVENTOS</div>
-              <div className="d-subtitle">Gestiona los eventos y competiciones que aparecen en la home</div>
+              <div className="d-subtitle">Gestiona los eventos y competiciones que aparecen en la web</div>
 
-              <div className="d-card">
-                <h3>AÑADIR EVENTO</h3>
+              <div className="d-card" style={{ borderColor: editingEvent ? "var(--red)" : undefined }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <h3>{editingEvent ? "✏️ EDITANDO EVENTO" : "AÑADIR EVENTO"}</h3>
+                  {editingEvent && <button className="d-btn d-btn-sm d-btn-ghost" onClick={cancelEdit}>Cancelar edición</button>}
+                </div>
                 <div className="d-row">
                   <div className="d-field">
                     <label>Nombre del evento</label>
@@ -582,36 +610,27 @@ export default function Dashboard() {
                       placeholder="Ej: Travessia d'Hivern" />
                   </div>
                   <div className="d-field">
-                    <label>Fecha</label>
+                    <label>Fecha (texto, ej: Enero 2026)</label>
                     <input type="text" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                      placeholder="Ej: Enero 2026" />
-                  </div>
-                </div>
-                <div className="d-row">
-                  <div className="d-field">
-                    <label>Tipo</label>
-                    <select value={newEvent.type} onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}>
-                      <option>Triatlón</option><option>Duatlón</option><option>Acuatlón</option>
-                      <option>Natación</option><option>Aquabike</option><option>Swimrun</option>
-                    </select>
-                  </div>
-                  <div className="d-field">
-                    <label>Tipo</label>
-                    <select value={newEvent.type} onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}>
-                      <option>Triatlón</option><option>Duatlón</option><option>Acuatlón</option>
-                      <option>Natación</option><option>Aquabike</option><option>Swimrun</option>
-                    </select>
+                      placeholder="Ej: 15 Enero 2026" />
                   </div>
                 </div>
                 <div className="d-field">
-                  <label>Imagen del cartel (sube PNG/JPG o pega URL)</label>
+                  <label>Tipo</label>
+                  <select value={newEvent.type} onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}>
+                    <option>Triatlón</option><option>Duatlón</option><option>Acuatlón</option>
+                    <option>Natación</option><option>Aquabike</option><option>Swimrun</option>
+                  </select>
+                </div>
+                <div className="d-field">
+                  <label>Imagen del cartel (sube PNG/JPG max 800KB o pega URL)</label>
                   <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <input type="file" accept="image/*" onChange={(e) => { if (e.target.files?.[0]) uploadImage(e.target.files[0]); }}
                       style={{ flex: 1, minWidth: 200 }} />
-                    {uploadingImg && <span style={{ fontSize: 12, color: "var(--red-l)" }}>Subiendo...</span>}
+                    {uploadingImg && <span style={{ fontSize: 12, color: "var(--red-l)" }}>Cargando...</span>}
                   </div>
-                  <input type="url" value={newEvent.imgUrl} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
-                    placeholder="O pega una URL directamente: https://..." style={{ marginTop: 8 }} />
+                  <input type="url" value={newEvent.imgUrl && !newEvent.imgUrl.startsWith("data:") ? newEvent.imgUrl : ""} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
+                    placeholder="O pega una URL: https://..." style={{ marginTop: 8 }} />
                   {newEvent.imgUrl && (
                     <div style={{ marginTop: 12, borderRadius: 10, overflow: "hidden", maxWidth: 200 }}>
                       <img src={newEvent.imgUrl} alt="Preview" style={{ width: "100%", height: "auto", display: "block" }} />
@@ -621,11 +640,11 @@ export default function Dashboard() {
                 <div className="d-field">
                   <label>Descripción del evento</label>
                   <textarea value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                    placeholder="Describe el evento: recorrido, categorías, horarios..." style={{ minHeight: 100 }} />
+                    placeholder="Recorrido, categorías, horarios, info relevante..." style={{ minHeight: 100 }} />
                 </div>
                 <div className="d-row">
                   <div className="d-field">
-                    <label>Enlace reglamento (PDF Google Drive)</label>
+                    <label>Enlace reglamento (PDF / Google Drive)</label>
                     <input type="url" value={newEvent.reglamentoUrl} onChange={(e) => setNewEvent({ ...newEvent, reglamentoUrl: e.target.value })}
                       placeholder="https://drive.google.com/..." />
                   </div>
@@ -635,11 +654,18 @@ export default function Dashboard() {
                       placeholder="https://..." />
                   </div>
                 </div>
-                <button className="d-btn" onClick={addEvent}>➕ Añadir Evento</button>
+                <div className="d-field">
+                  <label>Enlace resultados (URL o PDF Google Drive)</label>
+                  <input type="url" value={newEvent.resultadosUrl} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl: e.target.value })}
+                    placeholder="https://..." />
+                </div>
+                <button className="d-btn" onClick={saveEvent}>
+                  {editingEvent ? "💾 Guardar Cambios" : "➕ Añadir Evento"}
+                </button>
               </div>
 
               <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>
-                EVENTOS ACTUALES ({events.length})
+                EVENTOS ({events.length})
               </h3>
               {events.map(ev => (
                 <div key={ev.id} className="d-list-item">
@@ -647,10 +673,13 @@ export default function Dashboard() {
                     {ev.imgUrl && <img src={ev.imgUrl} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }} />}
                     <div className="d-list-info">
                       <h4>{ev.title}</h4>
-                      <p>{ev.date} · {ev.type}</p>
+                      <p>{ev.date} · {ev.type}{ev.resultadosUrl ? " · 📊 Resultados" : ""}</p>
                     </div>
                   </div>
-                  <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button className="d-btn d-btn-sm d-btn-ghost" onClick={() => startEditEvent(ev)}>✏️ Editar</button>
+                    <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button>
+                  </div>
                 </div>
               ))}
             </>
