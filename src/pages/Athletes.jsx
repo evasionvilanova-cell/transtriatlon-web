@@ -11,6 +11,8 @@ export default function Athletes() {
   const [authenticated, setAuthenticated] = useState(false);
   const [error, setError] = useState("");
   const [trainings, setTrainings] = useState([]);
+  const [ritmos, setRitmos] = useState([]);
+  const [licencias, setLicencias] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Check if already authenticated in session
@@ -48,6 +50,17 @@ export default function Athletes() {
           items.push({ id: d.id, ...data });
         }
         setTrainings(items);
+
+        // Load ritmos
+        const qr = query(collection(db, "ritmos"), orderBy("createdAt", "desc"));
+        const snapR = await getDocs(qr);
+        setRitmos(snapR.docs.map(d => ({ id: d.id, ...d.data() })));
+
+        // Load licencias
+        const ql = query(collection(db, "licencias"), orderBy("createdAt", "desc"));
+        const snapL = await getDocs(ql);
+        setLicencias(snapL.docs.map(d => ({ id: d.id, ...d.data() })));
+
       } catch (e) { console.error(e); }
       setLoading(false);
     };
@@ -179,12 +192,12 @@ export default function Athletes() {
               <h3>ENTRENAMIENTOS</h3>
               <p>Planes semanales en PDF</p>
             </div>
-            <div className="ath-sec-card">
+            <div className="ath-sec-card" onClick={() => document.getElementById("licencias")?.scrollIntoView({ behavior: "smooth" })}>
               <div className="ath-sec-icon">📋</div>
               <h3>TRAMITACIÓN LICENCIA</h3>
               <p>Federació Catalana de Triatló</p>
             </div>
-            <div className="ath-sec-card">
+            <div className="ath-sec-card" onClick={() => document.getElementById("ritmos")?.scrollIntoView({ behavior: "smooth" })}>
               <div className="ath-sec-icon">⏱️</div>
               <h3>RITMOS</h3>
               <p>Tablas y zonas de entreno</p>
@@ -217,6 +230,44 @@ export default function Athletes() {
                       📄 Descargar PDF
                     </a>
                   )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Licencias section */}
+          <div className="ath-trainings" id="licencias">
+            <h2>TRAMITACIÓN LICENCIA</h2>
+            {licencias.length === 0 ? (
+              <div className="ath-empty">No hay documentos de licencias disponibles todavía.</div>
+            ) : (
+              licencias.map((l) => (
+                <div key={l.id} className="ath-week">
+                  <div className="ath-week-info">
+                    <div className="ath-week-date">📋 {l.title}</div>
+                  </div>
+                  <a href={l.pdfUrl} target="_blank" rel="noreferrer" className="ath-dl">
+                    📄 Ver PDF
+                  </a>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Ritmos section */}
+          <div className="ath-trainings" id="ritmos" style={{ paddingBottom: 80 }}>
+            <h2>RITMOS</h2>
+            {ritmos.length === 0 ? (
+              <div className="ath-empty">No hay documentos de ritmos disponibles todavía.</div>
+            ) : (
+              ritmos.map((r) => (
+                <div key={r.id} className="ath-week">
+                  <div className="ath-week-info">
+                    <div className="ath-week-date">⏱️ {r.title}</div>
+                  </div>
+                  <a href={r.pdfUrl} target="_blank" rel="noreferrer" className="ath-dl">
+                    📄 Ver PDF
+                  </a>
                 </div>
               ))
             )}
