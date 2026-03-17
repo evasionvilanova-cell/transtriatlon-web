@@ -40,6 +40,13 @@ export default function Dashboard() {
   const [licencias, setLicencias] = useState([]);
   const [newLicencia, setNewLicencia] = useState({ title: "", pdfUrl: "" });
 
+  // Inscripciones state
+  const [inscripciones, setInscripciones] = useState([]);
+
+  // Atletas state
+  const [atletas, setAtletas] = useState([]);
+  const [newAtleta, setNewAtleta] = useState({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
+
   useEffect(() => {
     const saved = sessionStorage.getItem("tt-coach-auth");
     if (saved === "true") setAuth(true);
@@ -63,6 +70,8 @@ export default function Dashboard() {
     loadEvents();
     loadRitmos();
     loadLicencias();
+    loadInscripciones();
+    loadAtletas();
   }, [auth]);
 
   const loadTrainings = async () => {
@@ -211,6 +220,81 @@ export default function Dashboard() {
     } catch (e) { setMsg("Error: " + e.message); }
   };
 
+  // ── INSCRIPCIONES ──
+  const loadInscripciones = async () => {
+    try {
+      const q = query(collection(db, "inscripciones"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      setInscripciones(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) { console.error(e); }
+  };
+
+  const deleteInscripcion = async (ins) => {
+    if (!confirm(`¿Eliminar inscripción de "${ins.nombre} ${ins.apellidos}"?`)) return;
+    try {
+      await deleteDoc(doc(db, "inscripciones", ins.id));
+      setMsg("Inscripción eliminada"); loadInscripciones();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const aprobarInscripcion = async (ins) => {
+    try {
+      await addDoc(collection(db, "atletas"), {
+        nombre: ins.nombre, apellidos: ins.apellidos, fechaNacimiento: ins.fechaNacimiento,
+        dni: ins.dni, direccion: ins.direccion, email: ins.email, movil: ins.movil,
+        numeroCuenta: ins.numeroCuenta, formaPago: ins.formaPago, tipoCuota: ins.tipoCuota,
+        redes: ins.redes || "", createdAt: serverTimestamp(),
+      });
+      await deleteDoc(doc(db, "inscripciones", ins.id));
+      setMsg("✅ Atleta añadido y inscripción procesada!");
+      loadInscripciones(); loadAtletas();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const exportInscripcionesCSV = () => {
+    const headers = ["Nombre","Apellidos","Fecha Nac.","DNI","Dirección","Email","Móvil","Redes","Apto Físico","Tipo Cuota","Cuenta","Forma Pago"];
+    const rows = inscripciones.map(i => [i.nombre,i.apellidos,i.fechaNacimiento,i.dni,i.direccion,i.email,i.movil,i.redes,i.aptoFisico,i.tipoCuota,i.numeroCuenta,i.formaPago]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${(c||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "inscripciones_transtriatlon.csv"; a.click();
+  };
+
+  // ── ATLETAS ──
+  const loadAtletas = async () => {
+    try {
+      const q = query(collection(db, "atletas"), orderBy("apellidos", "asc"));
+      const snap = await getDocs(q);
+      setAtletas(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) { console.error(e); }
+  };
+
+  const addAtleta = async () => {
+    if (!newAtleta.nombre || !newAtleta.apellidos) { setMsg("Nombre y apellidos son obligatorios"); return; }
+    try {
+      await addDoc(collection(db, "atletas"), { ...newAtleta, createdAt: serverTimestamp() });
+      setNewAtleta({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
+      setMsg("✅ Atleta añadido!"); loadAtletas();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const deleteAtleta = async (a) => {
+    if (!confirm(`¿Eliminar atleta "${a.nombre} ${a.apellidos}"?`)) return;
+    try {
+      await deleteDoc(doc(db, "atletas", a.id));
+      setMsg("Atleta eliminado"); loadAtletas();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const exportAtletasCSV = () => {
+    const headers = ["Nombre","Apellidos","Fecha Nac.","DNI","Dirección","Email","Móvil","Cuenta","Forma Pago","Tipo Cuota"];
+    const rows = atletas.map(a => [a.nombre,a.apellidos,a.fechaNacimiento,a.dni,a.direccion,a.email,a.movil,a.numeroCuenta,a.formaPago,a.tipoCuota]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${(c||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a2 = document.createElement("a"); a2.href = url; a2.download = "atletas_transtriatlon.csv"; a2.click();
+  };
+
   if (!auth) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--dark)", color: "var(--white)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -317,7 +401,7 @@ export default function Dashboard() {
 
       {/* Mobile tabs */}
       <div className="d-mob-tabs">
-        {[["trainings","🏋️ Entrenos"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"],["ritmos","⏱️ Ritmos"],["licencias","📋 Licencias"]].map(([id,label]) => (
+        {[["trainings","🏋️ Entrenos"],["inscripciones","📝 Inscripciones"],["atletas","👥 Atletas"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"],["ritmos","⏱️ Ritmos"],["licencias","📋 Licencias"]].map(([id,label]) => (
           <button key={id} className={`d-mob-tab ${tab===id?"ac":""}`} onClick={()=>setTab(id)}>{label}</button>
         ))}
       </div>
@@ -327,6 +411,8 @@ export default function Dashboard() {
         <div className="d-side">
           {[
             { id: "trainings", icon: "🏋️", label: "Entrenamientos" },
+            { id: "inscripciones", icon: "📝", label: "Inscripciones" },
+            { id: "atletas", icon: "👥", label: "Atletas" },
             { id: "code", icon: "🔑", label: "Código Atletas" },
             { id: "banner", icon: "📢", label: "Banner" },
             { id: "events", icon: "🏆", label: "Eventos" },
@@ -596,6 +682,121 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
+            </>
+          )}
+
+          {/* ── INSCRIPCIONES TAB ── */}
+          {tab === "inscripciones" && (
+            <>
+              <div className="d-title">INSCRIPCIONES</div>
+              <div className="d-subtitle">Solicitudes de inscripción recibidas desde el formulario web</div>
+
+              <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
+                <button className="d-btn" onClick={exportInscripcionesCSV} disabled={inscripciones.length === 0}>
+                  📊 Exportar Excel (CSV)
+                </button>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", alignSelf: "center" }}>
+                  {inscripciones.length} inscripciones pendientes
+                </span>
+              </div>
+
+              {inscripciones.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay inscripciones pendientes.</p>}
+              {inscripciones.map(ins => (
+                <div key={ins.id} className="d-card" style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
+                    <div>
+                      <h3 style={{ marginBottom: 4 }}>{ins.nombre} {ins.apellidos}</h3>
+                      <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                        {ins.fechaNacimiento} · DNI: {ins.dni} · {ins.tipoCuota}
+                      </p>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="d-btn d-btn-sm" onClick={() => aprobarInscripcion(ins)}>✅ Aprobar y añadir</button>
+                      <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteInscripcion(ins)}>Eliminar</button>
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "8px 24px", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,.45)" }}>
+                    <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Email:</strong> {ins.email}</div>
+                    <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Móvil:</strong> {ins.movil}</div>
+                    <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Dirección:</strong> {ins.direccion}</div>
+                    <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Cuenta:</strong> {ins.numeroCuenta || "—"}</div>
+                    <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Pago:</strong> {ins.formaPago}</div>
+                    <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Apto físico:</strong> {ins.aptoFisico}</div>
+                    {ins.redes && <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Redes:</strong> {ins.redes}</div>}
+                    {ins.menorDatos && <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Tutor (menor):</strong> {ins.menorDatos}</div>}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* ── ATLETAS TAB ── */}
+          {tab === "atletas" && (
+            <>
+              <div className="d-title">LISTA DE ATLETAS</div>
+              <div className="d-subtitle">Todos los atletas registrados en Transtriatlon</div>
+
+              <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
+                <button className="d-btn" onClick={exportAtletasCSV} disabled={atletas.length === 0}>
+                  📊 Exportar Excel (CSV)
+                </button>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", alignSelf: "center" }}>
+                  {atletas.length} atletas registrados
+                </span>
+              </div>
+
+              <div className="d-card">
+                <h3>AÑADIR ATLETA MANUALMENTE</h3>
+                <div className="d-row">
+                  <div className="d-field"><label>Nombre</label><input type="text" value={newAtleta.nombre} onChange={(e) => setNewAtleta({...newAtleta, nombre: e.target.value})} /></div>
+                  <div className="d-field"><label>Apellidos</label><input type="text" value={newAtleta.apellidos} onChange={(e) => setNewAtleta({...newAtleta, apellidos: e.target.value})} /></div>
+                </div>
+                <div className="d-row">
+                  <div className="d-field"><label>Fecha nacimiento</label><input type="date" value={newAtleta.fechaNacimiento} onChange={(e) => setNewAtleta({...newAtleta, fechaNacimiento: e.target.value})} /></div>
+                  <div className="d-field"><label>DNI</label><input type="text" value={newAtleta.dni} onChange={(e) => setNewAtleta({...newAtleta, dni: e.target.value})} /></div>
+                </div>
+                <div className="d-field"><label>Dirección</label><input type="text" value={newAtleta.direccion} onChange={(e) => setNewAtleta({...newAtleta, direccion: e.target.value})} /></div>
+                <div className="d-row">
+                  <div className="d-field"><label>Email</label><input type="email" value={newAtleta.email} onChange={(e) => setNewAtleta({...newAtleta, email: e.target.value})} /></div>
+                  <div className="d-field"><label>Móvil</label><input type="tel" value={newAtleta.movil} onChange={(e) => setNewAtleta({...newAtleta, movil: e.target.value})} /></div>
+                </div>
+                <div className="d-row">
+                  <div className="d-field"><label>Número de cuenta</label><input type="text" value={newAtleta.numeroCuenta} onChange={(e) => setNewAtleta({...newAtleta, numeroCuenta: e.target.value})} /></div>
+                  <div className="d-field"><label>Tipo de cuota</label><input type="text" value={newAtleta.tipoCuota} onChange={(e) => setNewAtleta({...newAtleta, tipoCuota: e.target.value})} placeholder="Ej: 4 ACTIVIDADES ADULTO" /></div>
+                </div>
+                <button className="d-btn" onClick={addAtleta}>👤 Añadir Atleta</button>
+              </div>
+
+              <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>
+                ATLETAS REGISTRADOS ({atletas.length})
+              </h3>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <thead>
+                    <tr>
+                      {["Nombre","Apellidos","F. Nac.","DNI","Email","Móvil","Cuota","Pago",""].map(h => (
+                        <th key={h} style={{ textAlign: "left", padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,.08)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.3)", whiteSpace: "nowrap" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {atletas.map(a => (
+                      <tr key={a.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.7)" }}>{a.nombre}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.7)" }}>{a.apellidos}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{a.fechaNacimiento}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.dni}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.email}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{a.movil}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", fontSize: 11 }}>{a.tipoCuota}</td>
+                        <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.formaPago}</td>
+                        <td style={{ padding: "10px 8px" }}><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteAtleta(a)}>✕</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {atletas.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14, marginTop: 16 }}>No hay atletas registrados todavía.</p>}
             </>
           )}
         </div>
