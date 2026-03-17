@@ -448,7 +448,7 @@ a{text-decoration:none;color:inherit}
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p style={{ fontSize: "clamp(15px,1.6vw,18px)", fontWeight: 300, color: "rgba(255,255,255,.4)", marginTop: 20, lineHeight: 1.7, maxWidth: 480 }}>
+            <p style={{ fontSize: "clamp(15px,1.6vw,18px)", fontWeight: 300, color: "rgba(255,255,255,.75)", marginTop: 20, lineHeight: 1.7, maxWidth: 480 }}>
               Más de 30 años formando deportistas. Entrenamientos para todas las edades y niveles con entrenadores titulados.
             </p>
           </Reveal>
