@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { label: "Programas", id: "programs" },
   { label: "Cuotas", id: "cuotas" },
   { label: "Tarifas", id: "tarifas" },
-  { label: "Contacto", id: "contact" },
+  { label: "Contacto", id: "contacto-link" },
 ];
 
 const BANNER_DEFAULT = {
@@ -274,7 +274,7 @@ a{text-decoration:none;color:inherit}
 .sec-dark{background:var(--dark);color:var(--white)}
 .sec-alt{background:var(--bg2)}
 .ctn{max-width:1140px;margin:0 auto}
-.sec-label{font-size:28px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
 .sec-title{font-family:var(--display);font-size:clamp(36px,5.5vw,64px);letter-spacing:2px;line-height:1}
 .sec-desc{font-size:16px;font-weight:400;line-height:1.7;color:var(--text2);max-width:560px;margin-top:14px}
 .sec-dark .sec-desc{color:rgba(255,255,255,.45)}
@@ -376,7 +376,11 @@ a{text-decoration:none;color:inherit}
         </div>
         <ul className="hdr-nav">
           {NAV_LINKS.map(n => (
-            <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
+            n.id === "contacto-link" ? (
+              <li key={n.id}><Link to="/contacto" style={{ color: "inherit", textDecoration: "none" }}>{n.label}</Link></li>
+            ) : (
+              <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
+            )
           ))}
           <li>
             <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>Acceso Atletas</Link>
@@ -389,7 +393,13 @@ a{text-decoration:none;color:inherit}
       </header>
 
       <ul className={`mm ${menu ? "op" : ""}`}>
-        {NAV_LINKS.map(n => <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>)}
+        {NAV_LINKS.map(n => (
+          n.id === "contacto-link" ? (
+            <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/contacto"; }}>{n.label}</li>
+          ) : (
+            <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
+          )
+        ))}
       </ul>
 
       {/* ═══ BANNER ═══ */}
