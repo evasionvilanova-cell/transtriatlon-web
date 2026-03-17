@@ -49,6 +49,9 @@ export default function Dashboard() {
   const [atletas, setAtletas] = useState([]);
   const [newAtleta, setNewAtleta] = useState({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
 
+  // Mensajes state
+  const [mensajes, setMensajes] = useState([]);
+
   useEffect(() => {
     const saved = sessionStorage.getItem("tt-coach-auth");
     if (saved === "true") setAuth(true);
@@ -74,6 +77,7 @@ export default function Dashboard() {
     loadLicencias();
     loadInscripciones();
     loadAtletas();
+    loadMensajes();
   }, [auth]);
 
   const loadTrainings = async () => {
@@ -338,6 +342,23 @@ export default function Dashboard() {
     const a2 = document.createElement("a"); a2.href = url; a2.download = "atletas_transtriatlon.csv"; a2.click();
   };
 
+  // ── MENSAJES ──
+  const loadMensajes = async () => {
+    try {
+      const q = query(collection(db, "mensajes"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      setMensajes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) { console.error(e); }
+  };
+
+  const deleteMensaje = async (m) => {
+    if (!confirm("¿Eliminar este mensaje?")) return;
+    try {
+      await deleteDoc(doc(db, "mensajes", m.id));
+      setMsg("Mensaje eliminado"); loadMensajes();
+    } catch (e) { setMsg("Error: " + e.message); }
+  };
+
   if (!auth) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--dark)", color: "var(--white)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
@@ -444,7 +465,7 @@ export default function Dashboard() {
 
       {/* Mobile tabs */}
       <div className="d-mob-tabs">
-        {[["trainings","🏋️ Entrenos"],["inscripciones","📝 Inscripciones"],["atletas","👥 Atletas"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"],["ritmos","⏱️ Ritmos"],["licencias","📋 Licencias"]].map(([id,label]) => (
+        {[["trainings","🏋️ Entrenos"],["inscripciones","📝 Inscripciones"],["atletas","👥 Atletas"],["mensajes","💬 Mensajes"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"],["ritmos","⏱️ Ritmos"],["licencias","📋 Licencias"]].map(([id,label]) => (
           <button key={id} className={`d-mob-tab ${tab===id?"ac":""}`} onClick={()=>setTab(id)}>{label}</button>
         ))}
       </div>
@@ -456,6 +477,7 @@ export default function Dashboard() {
             { id: "trainings", icon: "🏋️", label: "Entrenamientos" },
             { id: "inscripciones", icon: "📝", label: "Inscripciones" },
             { id: "atletas", icon: "👥", label: "Atletas" },
+            { id: "mensajes", icon: "💬", label: "Mensajes" },
             { id: "code", icon: "🔑", label: "Código Atletas" },
             { id: "banner", icon: "📢", label: "Banner" },
             { id: "events", icon: "🏆", label: "Eventos" },
@@ -807,6 +829,36 @@ export default function Dashboard() {
                     <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Apto físico:</strong> {ins.aptoFisico}</div>
                     {ins.redes && <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Redes:</strong> {ins.redes}</div>}
                     {ins.menorDatos && <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Tutor (menor):</strong> {ins.menorDatos}</div>}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* ── MENSAJES TAB ── */}
+          {tab === "mensajes" && (
+            <>
+              <div className="d-title">MENSAJES DE CONTACTO</div>
+              <div className="d-subtitle">Mensajes recibidos desde el formulario de contacto de la web</div>
+
+              <span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", marginBottom: 24, display: "block" }}>
+                {mensajes.length} mensaje{mensajes.length !== 1 ? "s" : ""} recibido{mensajes.length !== 1 ? "s" : ""}
+              </span>
+
+              {mensajes.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay mensajes todavía.</p>}
+              {mensajes.map(m => (
+                <div key={m.id} className="d-card" style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+                    <div>
+                      <h3 style={{ marginBottom: 4 }}>{m.nombre}</h3>
+                      <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>
+                        {m.email}{m.movil ? ` · ${m.movil}` : ""}{m.asunto ? ` · ${m.asunto}` : ""}
+                      </p>
+                    </div>
+                    <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteMensaje(m)}>Eliminar</button>
+                  </div>
+                  <div style={{ marginTop: 14, padding: 16, borderRadius: 8, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)", fontSize: 14, color: "rgba(255,255,255,.6)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                    {m.mensaje}
                   </div>
                 </div>
               ))}
