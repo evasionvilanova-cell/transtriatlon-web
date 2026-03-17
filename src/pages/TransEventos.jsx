@@ -24,6 +24,25 @@ export default function TransEventos() {
     load();
   }, []);
 
+  const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    const months = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setembre:8,octubre:9,noviembre:10,diciembre:11 };
+    const parts = dateStr.toLowerCase().replace(/de /g, "").trim().split(/\s+/);
+    for (const [name, idx] of Object.entries(months)) {
+      for (const p of parts) {
+        if (p.startsWith(name.substring(0, 3))) {
+          const year = parts.find(x => /^\d{4}$/.test(x));
+          return new Date(year ? parseInt(year) : new Date().getFullYear(), idx, parts.find(x => /^\d{1,2}$/.test(x)) || 1);
+        }
+      }
+    }
+    return null;
+  };
+
+  const now = new Date();
+  const upcoming = events.filter(e => { const d = parseDate(e.date); return !d || d >= now; });
+  const past = events.filter(e => { const d = parseDate(e.date); return d && d < now; }).reverse();
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
       <style>{`
@@ -94,20 +113,51 @@ export default function TransEventos() {
           ) : events.length === 0 ? (
             <div className="te-empty">No hay eventos disponibles.</div>
           ) : (
-            <div className="te-grid">
-              {events.map(ev => (
-                <div key={ev.id} className="te-card" onClick={() => setSelected(ev)}>
-                  <div className="te-card-img">
-                    <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
-                    <div className="te-card-type">{ev.type}</div>
+            <>
+              {upcoming.length > 0 && (
+                <>
+                  <h2 style={{ fontFamily: "var(--display)", fontSize: 28, letterSpacing: 2, padding: "0 clamp(16px,4vw,48px)", maxWidth: 1200, margin: "0 auto 20px" }}>
+                    PRÓXIMOS EVENTOS
+                  </h2>
+                  <div className="te-grid">
+                    {upcoming.map(ev => (
+                      <div key={ev.id} className="te-card" onClick={() => setSelected(ev)}>
+                        <div className="te-card-img">
+                          <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
+                          <div className="te-card-type">{ev.type}</div>
+                        </div>
+                        <div className="te-card-body">
+                          <h3>{ev.title}</h3>
+                          <div className="date">{ev.date}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="te-card-body">
-                    <h3>{ev.title}</h3>
-                    <div className="date">{ev.date}</div>
+                </>
+              )}
+              {past.length > 0 && (
+                <>
+                  <h2 style={{ fontFamily: "var(--display)", fontSize: 28, letterSpacing: 2, padding: "48px clamp(16px,4vw,48px) 20px", maxWidth: 1200, margin: "0 auto", color: "var(--text2)" }}>
+                    EVENTOS PASADOS
+                  </h2>
+                  <div className="te-grid" style={{ opacity: 0.7 }}>
+                    {past.map(ev => (
+                      <div key={ev.id} className="te-card" onClick={() => setSelected(ev)}>
+                        <div className="te-card-img">
+                          <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
+                          <div className="te-card-type" style={{ background: "#666" }}>{ev.type}</div>
+                          {ev.resultadosUrl && <div style={{ position: "absolute", bottom: 12, right: 12, padding: "4px 12px", borderRadius: 100, background: "#fff", color: "var(--text)", fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>📊 RESULTADOS</div>}
+                        </div>
+                        <div className="te-card-body">
+                          <h3>{ev.title}</h3>
+                          <div className="date">{ev.date}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
+                </>
+              )}
+            </>
           )}
         </>
       ) : (
@@ -131,12 +181,17 @@ export default function TransEventos() {
               <div className="te-detail-desc">{selected.description}</div>
             )}
 
-            {(selected.reglamentoUrl || selected.inscripcionUrl) && (
+            {(selected.reglamentoUrl || selected.inscripcionUrl || selected.resultadosUrl) && (
               <div className="te-detail-docs">
                 <h3>DOCUMENTOS Y ENLACES</h3>
                 {selected.reglamentoUrl && (
                   <a href={selected.reglamentoUrl} target="_blank" rel="noreferrer" className="te-doc-link">
                     📄 Reglamento del evento
+                  </a>
+                )}
+                {selected.resultadosUrl && (
+                  <a href={selected.resultadosUrl} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,150,0,.06)", borderColor: "rgba(0,150,0,.15)", color: "#0a8a0a" }}>
+                    📊 Resultados
                   </a>
                 )}
                 {selected.inscripcionUrl && (
@@ -147,7 +202,7 @@ export default function TransEventos() {
               </div>
             )}
 
-            {!selected.description && !selected.reglamentoUrl && !selected.inscripcionUrl && (
+            {!selected.description && !selected.reglamentoUrl && !selected.inscripcionUrl && !selected.resultadosUrl && (
               <p style={{ color: "var(--text2)", fontSize: 15, marginTop: 16 }}>
                 Próximamente más información sobre este evento. Contacta con nosotros para más detalles.
               </p>
