@@ -472,7 +472,13 @@ a{text-decoration:none;color:inherit}
           <Reveal delay={0.05}><div className="sec-title">PRÓXIMOS EVENTOS</div></Reveal>
           <Reveal delay={0.1}><p className="sec-desc">Competiciones organizadas por Transtriatlon en Vilanova i la Geltrú.</p></Reveal>
           <div className="ev-grid">
-            {events.map((e, i) => (
+            {events.filter(e => {
+              if (!e.date) return true;
+              const d = /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? new Date(e.date + "T00:00:00") : null;
+              if (!d) return true;
+              const now = new Date(); now.setHours(0,0,0,0);
+              return d >= now;
+            }).map((e, i) => (
               <Reveal key={e.title} delay={0.1 + i * 0.08}>
                 <Link to="/eventos" style={{ textDecoration: "none", color: "inherit" }}>
                   <div className="ev-card">
