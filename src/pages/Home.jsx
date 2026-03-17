@@ -423,18 +423,18 @@ a{text-decoration:none;color:inherit}
 
       {/* ═══ HERO VISUAL ═══ */}
       <section style={{
-        background: `linear-gradient(135deg, var(--dark) 0%, #1a0a0a 100%)`,
+        background: `var(--dark)`,
         padding: "clamp(48px,8vw,100px) clamp(16px,4vw,48px)",
-        position: "relative", overflow: "hidden",
+        position: "relative", overflow: "hidden", minHeight: "70vh", display: "flex", alignItems: "center",
       }}>
         <div style={{
           position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse 60% 50% at 30% 80%, rgba(232,30,30,.15) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 80% 20%, rgba(196,20,20,.1) 0%, transparent 50%)",
+          backgroundImage: "url(https://lh3.googleusercontent.com/d/1p1WMVEo_0c2QnhP44G3dQHloQ4PaPIYC)",
+          backgroundSize: "cover", backgroundPosition: "center",
         }} />
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: "linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px)",
-          backgroundSize: "50px 50px",
+          background: "linear-gradient(135deg, rgba(11,10,9,.75) 0%, rgba(11,10,9,.6) 40%, rgba(11,10,9,.8) 100%)",
         }} />
         <div className="ctn" style={{ position: "relative", zIndex: 2 }}>
           <Reveal>
