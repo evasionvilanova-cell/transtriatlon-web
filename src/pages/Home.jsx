@@ -377,7 +377,7 @@ a{text-decoration:none;color:inherit}
         <ul className="hdr-nav">
           {NAV_LINKS.map(n => (
             n.id === "contacto-link" ? (
-              <li key={n.id}><Link to="/contacto" style={{ color: "inherit", textDecoration: "none" }}>{n.label}</Link></li>
+              <li key={n.id} onClick={() => { window.location.hash = "/contacto"; }}>{n.label}</li>
             ) : (
               <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
             )
