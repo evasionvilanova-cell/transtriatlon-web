@@ -382,7 +382,7 @@ a{text-decoration:none;color:inherit}
             <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>Acceso Atletas</Link>
           </li>
           <li>
-            <button className="hdr-cta" onClick={() => window.open(banner.ctaLink, "_blank")}>Inscríbete</button>
+            <Link to="/inscripcion" className="hdr-cta" style={{ textDecoration: "none" }}>Inscríbete</Link>
           </li>
         </ul>
         <div className={`hb ${menu ? "op" : ""}`} onClick={() => setMenu(!menu)}><span /><span /><span /></div>
