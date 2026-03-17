@@ -31,6 +31,7 @@ export default function Dashboard() {
   // Events state
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "" });
+  const [uploadingImg, setUploadingImg] = useState(false);
 
   // Ritmos state
   const [ritmos, setRitmos] = useState([]);
@@ -150,6 +151,27 @@ export default function Dashboard() {
   };
 
   // ── EVENTS ──
+  const uploadImage = async (file) => {
+    setUploadingImg(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await fetch("https://api.imgbb.com/1/upload?key=00c9de449d6b4e5f2e6e4b8e0c6a1f3d", {
+        method: "POST", body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewEvent(prev => ({ ...prev, imgUrl: data.data.url }));
+        setMsg("✅ Imagen subida correctamente!");
+      } else {
+        setMsg("❌ Error al subir imagen. Intenta de nuevo o pega una URL.");
+      }
+    } catch (e) {
+      setMsg("❌ Error: " + e.message);
+    }
+    setUploadingImg(false);
+  };
+
   const addEvent = async () => {
     if (!newEvent.title) { setMsg("El evento necesita un título"); return; }
     try {
@@ -578,10 +600,27 @@ export default function Dashboard() {
                     </select>
                   </div>
                   <div className="d-field">
-                    <label>URL imagen del cartel</label>
-                    <input type="url" value={newEvent.imgUrl} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
-                      placeholder="https://..." />
+                    <label>Tipo</label>
+                    <select value={newEvent.type} onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}>
+                      <option>Triatlón</option><option>Duatlón</option><option>Acuatlón</option>
+                      <option>Natación</option><option>Aquabike</option><option>Swimrun</option>
+                    </select>
                   </div>
+                </div>
+                <div className="d-field">
+                  <label>Imagen del cartel (sube PNG/JPG o pega URL)</label>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                    <input type="file" accept="image/*" onChange={(e) => { if (e.target.files?.[0]) uploadImage(e.target.files[0]); }}
+                      style={{ flex: 1, minWidth: 200 }} />
+                    {uploadingImg && <span style={{ fontSize: 12, color: "var(--red-l)" }}>Subiendo...</span>}
+                  </div>
+                  <input type="url" value={newEvent.imgUrl} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
+                    placeholder="O pega una URL directamente: https://..." style={{ marginTop: 8 }} />
+                  {newEvent.imgUrl && (
+                    <div style={{ marginTop: 12, borderRadius: 10, overflow: "hidden", maxWidth: 200 }}>
+                      <img src={newEvent.imgUrl} alt="Preview" style={{ width: "100%", height: "auto", display: "block" }} />
+                    </div>
+                  )}
                 </div>
                 <button className="d-btn" onClick={addEvent}>➕ Añadir Evento</button>
               </div>
@@ -591,9 +630,12 @@ export default function Dashboard() {
               </h3>
               {events.map(ev => (
                 <div key={ev.id} className="d-list-item">
-                  <div className="d-list-info">
-                    <h4>{ev.title}</h4>
-                    <p>{ev.date} · {ev.type}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 200 }}>
+                    {ev.imgUrl && <img src={ev.imgUrl} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }} />}
+                    <div className="d-list-info">
+                      <h4>{ev.title}</h4>
+                      <p>{ev.date} · {ev.type}</p>
+                    </div>
                   </div>
                   <button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button>
                 </div>
