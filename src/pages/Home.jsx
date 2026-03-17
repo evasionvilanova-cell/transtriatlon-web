@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../firebase.js";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, orderBy, getDocs } from "firebase/firestore";
 import "../styles.css";
 
 /* ═══════════════════════════════════════════
@@ -23,7 +23,7 @@ const BANNER_DEFAULT = {
   ctaLink: "https://transtriatlon.com/formulario-de-inscripcion/",
 };
 
-const EVENTS = [
+const EVENTS_DEFAULT = [
   { title: "Travessia d'Hivern", date: "Enero 2026", type: "Natación", img: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&h=400&fit=crop" },
   { title: "Travessia de Natació", date: "Junio 2026", type: "Natación", img: "https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=600&h=400&fit=crop" },
   { title: "Triatlón Vilanova", date: "Septiembre 2026", type: "Triatlón", img: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop" },
@@ -189,6 +189,7 @@ export default function Home() {
   const [banner, setBanner] = useState(BANNER_DEFAULT);
   const [sy, setSy] = useState(0);
   const [tarifaTab, setTarifaTab] = useState("adulto");
+  const [events, setEvents] = useState(EVENTS_DEFAULT);
 
   useEffect(() => {
     const loadBanner = async () => {
@@ -197,7 +198,20 @@ export default function Home() {
         if (snap.exists() && snap.data().text) setBanner(snap.data());
       } catch (e) { /* use default */ }
     };
+    const loadEvents = async () => {
+      try {
+        const q = query(collection(db, "events"), orderBy("date", "asc"));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          setEvents(snap.docs.map(d => {
+            const data = d.data();
+            return { title: data.title, date: data.date, type: data.type, img: data.imgUrl || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop" };
+          }));
+        }
+      } catch (e) { /* use defaults */ }
+    };
     loadBanner();
+    loadEvents();
   }, []);
 
   useEffect(() => {
@@ -437,7 +451,7 @@ a{text-decoration:none;color:inherit}
           <Reveal delay={0.05}><div className="sec-title">PRÓXIMOS EVENTOS</div></Reveal>
           <Reveal delay={0.1}><p className="sec-desc">Competiciones organizadas por Transtriatlon en Vilanova i la Geltrú.</p></Reveal>
           <div className="ev-grid">
-            {EVENTS.map((e, i) => (
+            {events.map((e, i) => (
               <Reveal key={e.title} delay={0.1 + i * 0.08}>
                 <div className="ev-card">
                   <img src={e.img} alt={e.title} />
