@@ -48,6 +48,8 @@ export default function Dashboard() {
   // Atletas state
   const [atletas, setAtletas] = useState([]);
   const [newAtleta, setNewAtleta] = useState({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
+  const [editingAtleta, setEditingAtleta] = useState(null);
+  const [showAddAtleta, setShowAddAtleta] = useState(false);
 
   // Mensajes state
   const [mensajes, setMensajes] = useState([]);
@@ -301,13 +303,35 @@ export default function Dashboard() {
     } catch (e) { console.error(e); }
   };
 
-  const addAtleta = async () => {
+  const saveAtleta = async () => {
     if (!newAtleta.nombre || !newAtleta.apellidos) { setMsg("Nombre y apellidos son obligatorios"); return; }
     try {
-      await addDoc(collection(db, "atletas"), { ...newAtleta, createdAt: serverTimestamp() });
+      if (editingAtleta) {
+        await setDoc(doc(db, "atletas", editingAtleta.id), { ...newAtleta, createdAt: editingAtleta.createdAt || serverTimestamp() });
+        setEditingAtleta(null);
+        setShowAddAtleta(false);
+        setMsg("✅ Atleta actualizado!");
+      } else {
+        await addDoc(collection(db, "atletas"), { ...newAtleta, createdAt: serverTimestamp() });
+        setMsg("✅ Atleta añadido!");
+      }
       setNewAtleta({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
-      setMsg("✅ Atleta añadido!"); loadAtletas();
+      loadAtletas();
     } catch (e) { setMsg("Error: " + e.message); }
+  };
+
+  const startEditAtleta = (a) => {
+    setEditingAtleta(a);
+    setNewAtleta({ nombre: a.nombre || "", apellidos: a.apellidos || "", fechaNacimiento: a.fechaNacimiento || "", dni: a.dni || "", direccion: a.direccion || "", email: a.email || "", movil: a.movil || "", numeroCuenta: a.numeroCuenta || "", formaPago: a.formaPago || "Mensual", tipoCuota: a.tipoCuota || "" });
+    setShowAddAtleta(true);
+    setMsg("Editando: " + a.nombre + " " + a.apellidos);
+  };
+
+  const cancelEditAtleta = () => {
+    setEditingAtleta(null);
+    setNewAtleta({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
+    setShowAddAtleta(false);
+    setMsg("");
   };
 
   const deleteAtleta = async (a) => {
@@ -887,42 +911,52 @@ export default function Dashboard() {
                 <button className="d-btn" onClick={exportAtletasCSV} disabled={atletas.length === 0}>
                   📊 Exportar Excel (CSV)
                 </button>
+                <button className="d-btn d-btn-ghost" onClick={() => { setShowAddAtleta(!showAddAtleta); if (editingAtleta) cancelEditAtleta(); }}>
+                  {showAddAtleta ? "✕ Cerrar" : "➕ Añadir Atleta"}
+                </button>
                 <span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", alignSelf: "center" }}>
                   {atletas.length} atletas registrados
                 </span>
               </div>
 
-              <div className="d-card">
-                <h3>AÑADIR ATLETA MANUALMENTE</h3>
-                <div className="d-row">
-                  <div className="d-field"><label>Nombre</label><input type="text" value={newAtleta.nombre} onChange={(e) => setNewAtleta({...newAtleta, nombre: e.target.value})} /></div>
-                  <div className="d-field"><label>Apellidos</label><input type="text" value={newAtleta.apellidos} onChange={(e) => setNewAtleta({...newAtleta, apellidos: e.target.value})} /></div>
+              {showAddAtleta && (
+                <div className="d-card" style={{ marginBottom: 24, borderColor: editingAtleta ? "var(--red)" : undefined }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <h3>{editingAtleta ? "✏️ EDITANDO ATLETA" : "AÑADIR ATLETA"}</h3>
+                    {editingAtleta && <button className="d-btn d-btn-sm d-btn-ghost" onClick={cancelEditAtleta}>Cancelar</button>}
+                  </div>
+                  <div className="d-row">
+                    <div className="d-field"><label>Nombre</label><input type="text" value={newAtleta.nombre} onChange={(e) => setNewAtleta({...newAtleta, nombre: e.target.value})} /></div>
+                    <div className="d-field"><label>Apellidos</label><input type="text" value={newAtleta.apellidos} onChange={(e) => setNewAtleta({...newAtleta, apellidos: e.target.value})} /></div>
+                  </div>
+                  <div className="d-row">
+                    <div className="d-field"><label>Fecha nacimiento</label><input type="date" value={newAtleta.fechaNacimiento} onChange={(e) => setNewAtleta({...newAtleta, fechaNacimiento: e.target.value})} /></div>
+                    <div className="d-field"><label>DNI</label><input type="text" value={newAtleta.dni} onChange={(e) => setNewAtleta({...newAtleta, dni: e.target.value})} /></div>
+                  </div>
+                  <div className="d-field"><label>Dirección</label><input type="text" value={newAtleta.direccion} onChange={(e) => setNewAtleta({...newAtleta, direccion: e.target.value})} /></div>
+                  <div className="d-row">
+                    <div className="d-field"><label>Email</label><input type="email" value={newAtleta.email} onChange={(e) => setNewAtleta({...newAtleta, email: e.target.value})} /></div>
+                    <div className="d-field"><label>Móvil</label><input type="tel" value={newAtleta.movil} onChange={(e) => setNewAtleta({...newAtleta, movil: e.target.value})} /></div>
+                  </div>
+                  <div className="d-row">
+                    <div className="d-field"><label>Número de cuenta</label><input type="text" value={newAtleta.numeroCuenta} onChange={(e) => setNewAtleta({...newAtleta, numeroCuenta: e.target.value})} /></div>
+                    <div className="d-field"><label>Tipo de cuota</label><input type="text" value={newAtleta.tipoCuota} onChange={(e) => setNewAtleta({...newAtleta, tipoCuota: e.target.value})} placeholder="Ej: 4 ACTIVIDADES ADULTO" /></div>
+                  </div>
+                  <button className="d-btn" onClick={saveAtleta}>
+                    {editingAtleta ? "💾 Guardar Cambios" : "👤 Añadir Atleta"}
+                  </button>
                 </div>
-                <div className="d-row">
-                  <div className="d-field"><label>Fecha nacimiento</label><input type="date" value={newAtleta.fechaNacimiento} onChange={(e) => setNewAtleta({...newAtleta, fechaNacimiento: e.target.value})} /></div>
-                  <div className="d-field"><label>DNI</label><input type="text" value={newAtleta.dni} onChange={(e) => setNewAtleta({...newAtleta, dni: e.target.value})} /></div>
-                </div>
-                <div className="d-field"><label>Dirección</label><input type="text" value={newAtleta.direccion} onChange={(e) => setNewAtleta({...newAtleta, direccion: e.target.value})} /></div>
-                <div className="d-row">
-                  <div className="d-field"><label>Email</label><input type="email" value={newAtleta.email} onChange={(e) => setNewAtleta({...newAtleta, email: e.target.value})} /></div>
-                  <div className="d-field"><label>Móvil</label><input type="tel" value={newAtleta.movil} onChange={(e) => setNewAtleta({...newAtleta, movil: e.target.value})} /></div>
-                </div>
-                <div className="d-row">
-                  <div className="d-field"><label>Número de cuenta</label><input type="text" value={newAtleta.numeroCuenta} onChange={(e) => setNewAtleta({...newAtleta, numeroCuenta: e.target.value})} /></div>
-                  <div className="d-field"><label>Tipo de cuota</label><input type="text" value={newAtleta.tipoCuota} onChange={(e) => setNewAtleta({...newAtleta, tipoCuota: e.target.value})} placeholder="Ej: 4 ACTIVIDADES ADULTO" /></div>
-                </div>
-                <button className="d-btn" onClick={addAtleta}>👤 Añadir Atleta</button>
-              </div>
+              )}
 
-              <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>
+              <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "16px 0 16px" }}>
                 ATLETAS REGISTRADOS ({atletas.length})
               </h3>
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
                     <tr>
-                      {["Nombre","Apellidos","F. Nac.","DNI","Email","Móvil","Cuota","Pago",""].map(h => (
-                        <th key={h} style={{ textAlign: "left", padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,.08)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.3)", whiteSpace: "nowrap" }}>{h}</th>
+                      {["Nombre","Apellidos","F. Nac.","DNI","Email","Móvil","Cuota","Pago","",""].map((h,i) => (
+                        <th key={h+i} style={{ textAlign: "left", padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,.08)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.3)", whiteSpace: "nowrap" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -937,6 +971,7 @@ export default function Dashboard() {
                         <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{a.movil}</td>
                         <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", fontSize: 11 }}>{a.tipoCuota}</td>
                         <td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.formaPago}</td>
+                        <td style={{ padding: "10px 8px" }}><button className="d-btn d-btn-sm d-btn-ghost" onClick={() => startEditAtleta(a)}>✏️</button></td>
                         <td style={{ padding: "10px 8px" }}><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteAtleta(a)}>✕</button></td>
                       </tr>
                     ))}
