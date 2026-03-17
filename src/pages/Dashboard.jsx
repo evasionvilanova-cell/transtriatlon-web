@@ -31,7 +31,6 @@ export default function Dashboard() {
   // Events state
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" });
-  const [uploadingImg, setUploadingImg] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
   // Ritmos state
@@ -156,22 +155,6 @@ export default function Dashboard() {
   };
 
   // ── EVENTS ──
-  const uploadImage = async (file) => {
-    if (file.size > 800000) { setMsg("❌ Imagen demasiado grande. Máximo 800KB. Reduce el tamaño."); return; }
-    setUploadingImg(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setNewEvent(prev => ({ ...prev, imgUrl: reader.result }));
-        setMsg("✅ Imagen cargada!");
-        setUploadingImg(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (e) {
-      setMsg("❌ Error: " + e.message);
-      setUploadingImg(false);
-    }
-  };
 
   const saveEvent = async () => {
     if (!newEvent.title) { setMsg("El evento necesita un título"); return; }
@@ -644,17 +627,18 @@ export default function Dashboard() {
                   </select>
                 </div>
                 <div className="d-field">
-                  <label>Imagen del cartel (sube PNG/JPG max 800KB o pega URL)</label>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                    <input type="file" accept="image/*" onChange={(e) => { if (e.target.files?.[0]) uploadImage(e.target.files[0]); }}
-                      style={{ flex: 1, minWidth: 200 }} />
-                    {uploadingImg && <span style={{ fontSize: 12, color: "var(--red-l)" }}>Cargando...</span>}
-                  </div>
-                  <input type="url" value={newEvent.imgUrl && !newEvent.imgUrl.startsWith("data:") ? newEvent.imgUrl : ""} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
-                    placeholder="O pega una URL: https://..." style={{ marginTop: 8 }} />
+                  <label>URL de la imagen del cartel</label>
+                  <input type="url" value={newEvent.imgUrl} onChange={(e) => setNewEvent({ ...newEvent, imgUrl: e.target.value })}
+                    placeholder="https://..." />
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 6, lineHeight: 1.5 }}>
+                    Sube la imagen a Google Drive → clic derecho → Compartir → "Cualquier persona con el enlace" → Copia el enlace.<br />
+                    Luego cambia <code>/file/d/XXXX/view</code> por <code>/uc?id=XXXX&export=download</code> para que se vea directamente.<br />
+                    También puedes usar cualquier URL directa de imagen (terminada en .jpg o .png).
+                  </p>
                   {newEvent.imgUrl && (
-                    <div style={{ marginTop: 12, borderRadius: 10, overflow: "hidden", maxWidth: 200 }}>
-                      <img src={newEvent.imgUrl} alt="Preview" style={{ width: "100%", height: "auto", display: "block" }} />
+                    <div style={{ marginTop: 12, borderRadius: 10, overflow: "hidden", maxWidth: 200, border: "1px solid rgba(255,255,255,.1)" }}>
+                      <img src={newEvent.imgUrl} alt="Preview" style={{ width: "100%", height: "auto", display: "block" }}
+                        onError={(e) => { e.target.style.display = "none"; }} />
                     </div>
                   )}
                 </div>
