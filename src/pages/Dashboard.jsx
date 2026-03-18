@@ -91,7 +91,7 @@ export default function Dashboard() {
     loadInscripciones();
     loadAtletas();
     loadMensajes();
-  }, [auth]);
+  }, [authenticated]);
 
   const loadTrainings = async () => {
     try {
