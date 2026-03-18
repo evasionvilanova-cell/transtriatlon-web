@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { db } from "../firebase.js";
+import { db, auth } from "../firebase.js";
 import { collection, query, orderBy, getDocs, doc, getDoc, setDoc, addDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 import "../styles.css";
 
 const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
 
 export default function Dashboard() {
-  const [auth, setAuth] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [tab, setTab] = useState("trainings");
   const [msg, setMsg] = useState("");
@@ -54,28 +56,32 @@ export default function Dashboard() {
   const [mensajes, setMensajes] = useState([]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("tt-coach-auth");
-    if (saved === "true") setAuth(true);
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setAuthenticated(!!user);
+    });
+    return () => unsub();
   }, []);
 
   const handleLogin = async () => {
     setMsg("");
+    if (!email || !pass) { setMsg("Introduce email y contraseña"); return; }
     try {
-      const snap = await getDoc(doc(db, "settings", "coachPassword"));
-      if (snap.exists() && snap.data().password === pass) {
-        setAuth(true);
-        sessionStorage.setItem("tt-coach-auth", "true");
-      } else {
-        setMsg("Contraseña incorrecta");
-      }
+      await signInWithEmailAndPassword(auth, email, pass);
     } catch (e) {
-      setMsg("Error de conexión. Inténtalo de nuevo.");
+      if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") setMsg("Contraseña incorrecta");
+      else if (e.code === "auth/user-not-found") setMsg("Usuario no encontrado");
+      else setMsg("Error: " + e.message);
     }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setAuthenticated(false);
   };
 
   // Load data when authenticated
   useEffect(() => {
-    if (!auth) return;
+    if (!authenticated) return;
     loadTrainings();
     loadAthleteCode();
     loadBanner();
@@ -373,7 +379,7 @@ export default function Dashboard() {
     } catch (e) { setMsg("Error: " + e.message); }
   };
 
-  if (!auth) {
+  if (!authenticated) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--dark)", color: "var(--white)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <style>{`
@@ -390,6 +396,8 @@ export default function Dashboard() {
           <img src={LOGO} alt="T" />
           <h1>DASHBOARD</h1>
           <p>Panel de administración para entrenadores</p>
+          <input className="dash-input" type="email" placeholder="Email" value={email}
+            onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: 10 }} />
           <input className="dash-input" type="password" placeholder="Contraseña" value={pass}
             onChange={(e) => setPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleLogin()} />
           <button className="dash-btn" onClick={handleLogin}>Entrar</button>
@@ -471,7 +479,7 @@ export default function Dashboard() {
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <Link to="/" style={{ color: "rgba(255,255,255,.4)", fontSize: 12 }}>Ver web</Link>
-          <button className="d-btn d-btn-sm d-btn-ghost" onClick={() => { setAuth(false); sessionStorage.removeItem("tt-coach-auth"); }}>
+          <button className="d-btn d-btn-sm d-btn-ghost" onClick={handleLogout}>
             Cerrar sesión
           </button>
         </div>
