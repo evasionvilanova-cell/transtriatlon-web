@@ -48,6 +48,25 @@ export default function Inscripcion() {
     setSending(true);
     try {
       await addDoc(collection(db, "inscripciones"), { ...form, estado: "pendiente", createdAt: serverTimestamp() });
+      // Send email notification
+      try {
+        await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            service_id: "service_izil5gw",
+            template_id: "template_7x13b34",
+            user_id: "5ij6Os2ZEaSZ2PWHb",
+            template_params: {
+              tipo: "Inscripción",
+              nombre: `${form.nombre} ${form.apellidos}`,
+              email: form.email,
+              movil: form.movil,
+              detalle: `DNI: ${form.dni}\nFecha Nac: ${form.fechaNacimiento}\nDirección: ${form.direccion}\nCuota: ${form.tipoCuota}\nPago: ${form.formaPago}\nApto físico: ${form.aptoFisico}`,
+            },
+          }),
+        });
+      } catch (e) { /* email failed silently */ }
       setSent(true);
     } catch (e) { setError("Error al enviar: " + e.message); }
     setSending(false);
