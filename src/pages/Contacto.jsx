@@ -22,6 +22,25 @@ export default function Contacto() {
     setSending(true);
     try {
       await addDoc(collection(db, "mensajes"), { ...form, leido: false, createdAt: serverTimestamp() });
+      // Send email notification
+      try {
+        await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            service_id: "service_izil5gw",
+            template_id: "template_7x13b34",
+            user_id: "5ij6Os2ZEaSZ2PWHb",
+            template_params: {
+              tipo: "Mensaje de Contacto",
+              nombre: form.nombre,
+              email: form.email,
+              movil: form.movil || "No indicado",
+              detalle: `Asunto: ${form.asunto || "General"}\n\nMensaje:\n${form.mensaje}`,
+            },
+          }),
+        });
+      } catch (e) { /* email failed silently */ }
       setSent(true);
     } catch (e) { setError("Error al enviar: " + e.message); }
     setSending(false);
