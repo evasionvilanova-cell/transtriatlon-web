@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { db } from "../firebase.js";
 import { doc, getDoc, collection, query, orderBy, getDocs } from "firebase/firestore";
 import "../styles.css";
+import T from "../translations.js";
 
 /* ═══════════════════════════════════════════
    DATA
@@ -186,6 +187,8 @@ function Reveal({ children, delay = 0, className = "" }) {
    ═══════════════════════════════════════════ */
 export default function Home() {
   const [menu, setMenu] = useState(false);
+  const [lang, setLang] = useState(localStorage.getItem("tt-lang") || "es");
+  const t = T[lang];
   const [banner, setBanner] = useState(BANNER_DEFAULT);
   const [sy, setSy] = useState(0);
   const [tarifaTab, setTarifaTab] = useState("adulto");
@@ -384,7 +387,7 @@ a{text-decoration:none;color:inherit}
           <span>TRANSTRIATLON</span>
         </div>
         <ul className="hdr-nav">
-          {NAV_LINKS.map(n => (
+          {t.nav.map(n => (
             n.id === "contacto-link" ? (
               <li key={n.id} onClick={() => { window.location.hash = "/contacto"; }}>{n.label}</li>
             ) : (
@@ -392,25 +395,37 @@ a{text-decoration:none;color:inherit}
             )
           ))}
           <li>
-            <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>Acceso Atletas</Link>
+            <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>{t.accesoAtletas}</Link>
           </li>
           <li>
-            <Link to="/inscripcion" className="hdr-cta" style={{ textDecoration: "none" }}>Inscríbete</Link>
+            <Link to="/inscripcion" className="hdr-cta" style={{ textDecoration: "none" }}>{t.inscribete}</Link>
+          </li>
+          <li style={{ display: "flex", gap: 4 }}>
+            {["es","ca","en"].map(l => (
+              <button key={l} onClick={() => { setLang(l); localStorage.setItem("tt-lang", l); }}
+                style={{ padding: "4px 8px", borderRadius: 6, border: lang === l ? "1px solid var(--red)" : "1px solid rgba(0,0,0,.1)", background: lang === l ? "var(--red)" : "transparent", color: lang === l ? "#fff" : "var(--text2)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "var(--font)", textTransform: "uppercase", transition: "all .2s" }}>{l}</button>
+            ))}
           </li>
         </ul>
         <div className={`hb ${menu ? "op" : ""}`} onClick={() => setMenu(!menu)}><span /><span /><span /></div>
       </header>
 
       <ul className={`mm ${menu ? "op" : ""}`}>
-        {NAV_LINKS.map(n => (
+        {t.nav.map(n => (
           n.id === "contacto-link" ? (
             <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/contacto"; }}>{n.label}</li>
           ) : (
             <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
           )
         ))}
-        <li onClick={() => { setMenu(false); window.location.hash = "/atletas"; }}>Acceso Atletas</li>
-        <li onClick={() => { setMenu(false); window.location.hash = "/inscripcion"; }} style={{ color: "var(--red)" }}>Inscríbete</li>
+        <li onClick={() => { setMenu(false); window.location.hash = "/atletas"; }}>{t.accesoAtletas}</li>
+        <li onClick={() => { setMenu(false); window.location.hash = "/inscripcion"; }} style={{ color: "var(--red)" }}>{t.inscribete}</li>
+        <li style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
+          {["es","ca","en"].map(l => (
+            <button key={l} onClick={() => { setLang(l); localStorage.setItem("tt-lang", l); setMenu(false); }}
+              style={{ padding: "8px 16px", borderRadius: 8, border: lang === l ? "2px solid var(--red)" : "2px solid rgba(0,0,0,.1)", background: lang === l ? "var(--red)" : "transparent", color: lang === l ? "#fff" : "var(--text)", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "var(--display)", letterSpacing: 2, textTransform: "uppercase" }}>{l}</button>
+          ))}
+        </li>
       </ul>
 
       {/* ═══ BANNER ═══ */}
@@ -439,27 +454,27 @@ a{text-decoration:none;color:inherit}
         <div className="ctn" style={{ position: "relative", zIndex: 2 }}>
           <Reveal>
             <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--red-l)", marginBottom: 12 }}>
-              Club de Triatlón · Vilanova i la Geltrú
+              {t.hero.label}
             </p>
           </Reveal>
           <Reveal delay={0.1}>
             <h1 style={{ fontFamily: "var(--display)", fontSize: "clamp(48px,10vw,110px)", lineHeight: .9, letterSpacing: -1, color: "#fff" }}>
-              SWIM. BIKE.<br /><span style={{ color: "var(--red)" }}>RUN.</span>
+              {t.hero.title1}<br /><span style={{ color: "var(--red)" }}>{t.hero.title2}</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p style={{ fontSize: "clamp(15px,1.6vw,18px)", fontWeight: 300, color: "rgba(255,255,255,.75)", marginTop: 20, lineHeight: 1.7, maxWidth: 480 }}>
-              Más de 30 años formando deportistas. Entrenamientos para todas las edades y niveles con entrenadores titulados.
+            <p style={{ fontSize: "clamp(15px,1.6vw,18px)", fontWeight: 300, color: "rgba(255,255,255,.4)", marginTop: 20, lineHeight: 1.7, maxWidth: 480 }}>
+              {t.hero.sub}
             </p>
           </Reveal>
           <Reveal delay={0.3}>
             <div style={{ display: "flex", gap: 14, marginTop: 36, flexWrap: "wrap" }}>
-              <button className="hdr-cta" style={{ padding: "14px 32px", fontSize: 14 }} onClick={() => go("cuotas")}>Ver Programas</button>
+              <button className="hdr-cta" style={{ padding: "14px 32px", fontSize: 14 }} onClick={() => go("cuotas")}>{t.hero.cta1}</button>
               <button style={{
                 padding: "14px 32px", borderRadius: 100, border: "1px solid rgba(255,255,255,.2)",
                 background: "transparent", color: "#fff", fontFamily: "var(--font)", fontSize: 14,
                 fontWeight: 500, cursor: "pointer", transition: "all .25s",
-              }} onClick={() => window.location.hash = "/contacto"}>Contactar</button>
+              }} onClick={() => window.location.hash = "/contacto"}>{t.hero.cta2}</button>
             </div>
           </Reveal>
         </div>
@@ -468,8 +483,8 @@ a{text-decoration:none;color:inherit}
       {/* ═══ TRANSEVENTS ═══ */}
       <section className="sec" id="events">
         <div className="ctn">
-          <Reveal><div className="sec-label">TransEventos</div></Reveal>
-          <Reveal delay={0.05}><div className="sec-title">PRÓXIMOS EVENTOS</div></Reveal>
+          <Reveal><div className="sec-label">{t.events.label}</div></Reveal>
+          <Reveal delay={0.05}><div className="sec-title">{t.events.title}</div></Reveal>
           <Reveal delay={0.1}><p className="sec-desc">Competiciones organizadas por Transtriatlon en Vilanova i la Geltrú.</p></Reveal>
           <div className="ev-grid">
             {events.filter(e => {
@@ -495,7 +510,7 @@ a{text-decoration:none;color:inherit}
           </div>
           <div style={{ textAlign: "center", marginTop: 32 }}>
             <Link to="/eventos" style={{ padding: "12px 28px", borderRadius: 100, border: "1px solid rgba(0,0,0,.12)", color: "var(--text)", fontSize: 13, fontWeight: 600, textDecoration: "none", transition: "all .25s", display: "inline-block" }}>
-              Ver todos los eventos →
+              {t.events.all}
             </Link>
           </div>
         </div>
@@ -504,11 +519,11 @@ a{text-decoration:none;color:inherit}
       {/* ═══ PROGRAMS ═══ */}
       <section className="sec sec-dark" id="programs">
         <div className="ctn">
-          <Reveal><div className="sec-label">Programas</div></Reveal>
-          <Reveal delay={0.05}><div className="sec-title">ENTRENA CON NOSOTROS</div></Reveal>
-          <Reveal delay={0.1}><p className="sec-desc">Programas adaptados a cada edad y nivel deportivo.</p></Reveal>
+          <Reveal><div className="sec-label">{t.programs.label}</div></Reveal>
+          <Reveal delay={0.05}><div className="sec-title">{t.programs.title}</div></Reveal>
+          <Reveal delay={0.1}><p className="sec-desc">{t.programs.desc}</p></Reveal>
           <div className="pr-grid">
-            {PROGRAMS.map((p, i) => (
+            {t.programs.items.map((p, i) => (
               <Reveal key={p.name} delay={0.1 + i * 0.07}>
                 <div className="pr-card" style={{ "--pa": p.accent }}>
                   <div className="pr-icon">{p.icon}</div>
@@ -525,11 +540,11 @@ a{text-decoration:none;color:inherit}
       {/* ═══ CUOTAS ═══ */}
       <section className="sec" id="cuotas">
         <div className="ctn">
-          <Reveal><div className="sec-label">Tipos de Cuota</div></Reveal>
-          <Reveal delay={0.05}><div className="sec-title">¿QUÉ INCLUYE CADA CUOTA?</div></Reveal>
-          <Reveal delay={0.1}><p className="sec-desc">Todas las cuotas incluyen matrícula de 40€ (un solo pago al darse de alta).</p></Reveal>
+          <Reveal><div className="sec-label">{t.cuotas.label}</div></Reveal>
+          <Reveal delay={0.05}><div className="sec-title">{t.cuotas.title}</div></Reveal>
+          <Reveal delay={0.1}><p className="sec-desc">{t.cuotas.desc}</p></Reveal>
           <div className="cu-grid">
-            {CUOTAS.map((c, i) => (
+            {t.cuotas.items.map((c, i) => (
               <Reveal key={c.name} delay={0.1 + i * 0.07}>
                 <div className={`cu-card ${c.featured ? "ft" : ""}`}>
                   <div className="cu-name">{c.name}</div>
@@ -551,9 +566,9 @@ a{text-decoration:none;color:inherit}
       {/* ═══ TARIFAS ═══ */}
       <section className="sec sec-dark" id="tarifas">
         <div className="ctn">
-          <Reveal><div className="sec-label">Tarifas</div></Reveal>
-          <Reveal delay={0.05}><div className="sec-title">PRECIOS POR PROGRAMA</div></Reveal>
-          <Reveal delay={0.1}><p className="sec-desc">Pago trimestral o mensual. Matrícula única de 40€.</p></Reveal>
+          <Reveal><div className="sec-label">{t.tarifas.label}</div></Reveal>
+          <Reveal delay={0.05}><div className="sec-title">{t.tarifas.title}</div></Reveal>
+          <Reveal delay={0.1}><p className="sec-desc">{t.tarifas.desc}</p></Reveal>
           <Reveal delay={0.15}>
             <div className="tf-tabs">
               {["adulto", "joven", "academy"].map(t => (
@@ -567,10 +582,10 @@ a{text-decoration:none;color:inherit}
             <table className="tf-table">
               <thead>
                 <tr>
-                  <th>Actividades</th>
-                  <th>Trimestre</th>
-                  <th>Mes</th>
-                  {tarifaTab === "academy" && <th>Anual</th>}
+                  <th>{t.tarifas.actividades}</th>
+                  <th>{t.tarifas.trimestre}</th>
+                  <th>{t.tarifas.mes}</th>
+                  {tarifaTab === "academy" && <th>{t.tarifas.anual}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -584,17 +599,16 @@ a{text-decoration:none;color:inherit}
                 ))}
               </tbody>
             </table>
-            <div className="tf-mat">Matrícula: 40€ · Solo se paga una vez, manteniendo la continuidad durante el año.</div>
+            <div className="tf-mat">{t.tarifas.matricula}</div>
           </Reveal>
 
           <Reveal delay={0.25}>
             <div className="tf-personal">
-              <h4>ENTRENOS PERSONALES</h4>
+              <h4>{t.tarifas.personal.title}</h4>
               <p>
-                Servicio abierto para deportistas externos y de Transtriatlon. Planificación online semanal a través de Train2Go,
-                adaptada a tu disponibilidad. Diferentes modalidades disponibles.
+                {t.tarifas.personal.desc}
                 <br /><br />
-                Consulta tarifas sin compromiso: <a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a> o
+                {t.tarifas.personal.contact} <a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a> o
                 <a href="tel:683542061"> 683 542 061</a> (Nico Saenz)
               </p>
             </div>
@@ -604,7 +618,7 @@ a{text-decoration:none;color:inherit}
 
       {/* ═══ SPONSORS ═══ */}
       <div className="sp-sec">
-        <div className="sp-title">COLABORADORES Y PATROCINADORES</div>
+        <div className="sp-title">{t.sponsors}</div>
         <div className="sp-track">
           <div className="sp-inner">
             {[...SPONSORS, ...SPONSORS].map((s, i) => (
@@ -622,7 +636,7 @@ a{text-decoration:none;color:inherit}
               <img src={LOGO} alt="Logo" />
               <span>TRANSTRIATLON</span>
             </div>
-            <p className="ftr-desc">Club especializado en deportes de resistencia. Más de 30 años formando deportistas en Vilanova i la Geltrú.</p>
+            <p className="ftr-desc">{t.footer.desc}</p>
             <div className="ftr-social">
               <a href="https://www.facebook.com/entrenosdetriatlon.nicosaenz" target="_blank" rel="noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
               <a href="https://www.instagram.com/transtriatlon/" target="_blank" rel="noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
@@ -630,7 +644,7 @@ a{text-decoration:none;color:inherit}
             </div>
           </div>
           <div>
-            <h5>Programas</h5>
+            <h5>{t.footer.programas}</h5>
             <ul className="ftr-links">
               <li onClick={() => go("programs")}>Funcional</li>
               <li onClick={() => go("programs")}>Joven</li>
@@ -639,7 +653,7 @@ a{text-decoration:none;color:inherit}
             </ul>
           </div>
           <div>
-            <h5>Eventos</h5>
+            <h5>{t.footer.eventos}</h5>
             <ul className="ftr-links">
               <li>Travessia d'Hivern</li>
               <li>Travessia de Natació</li>
@@ -649,7 +663,7 @@ a{text-decoration:none;color:inherit}
             </ul>
           </div>
           <div>
-            <h5>Contacto</h5>
+            <h5>{t.footer.contacto}</h5>
             <ul className="ftr-links">
               <li><a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a></li>
               <li><a href="tel:683542061">683 542 061</a></li>
@@ -659,7 +673,7 @@ a{text-decoration:none;color:inherit}
           </div>
         </div>
         <div className="ftr-bottom">
-          <span>© 2026 Transtriatlon. Todos los derechos reservados.</span>
+          <span>{t.footer.derechos}</span>
           <Link to="/dashboard" style={{ color: "#fff", fontSize: 13, textDecoration: "none", padding: "8px 20px", borderRadius: 100, border: "1px solid rgba(255,255,255,.25)", fontWeight: 600 }}>🔒 Dashboard</Link>
           <span>📍 Vilanova i la Geltrú, Barcelona</span>
         </div>
