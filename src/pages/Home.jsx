@@ -668,7 +668,7 @@ a{text-decoration:none;color:inherit}
               <li><a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a></li>
               <li><a href="tel:683542061">683 542 061</a></li>
               <li>Vilanova i la Geltrú</li>
-              <li onClick={() => window.open("https://transtriatlon.com/formulario-de-inscripcion/", "_blank")}>Formulario de Inscripción</li>
+              <li onClick={() => window.location.hash = "/inscripcion"}>Formulario de Inscripción</li>
             </ul>
           </div>
         </div>
