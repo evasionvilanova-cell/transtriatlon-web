@@ -6,6 +6,7 @@ import Inscripcion from "./pages/Inscripcion.jsx";
 import TransEventos from "./pages/TransEventos.jsx";
 import Contacto from "./pages/Contacto.jsx";
 import Privacidad from "./pages/Privacidad.jsx";
+import QuienesSomos from "./pages/QuienesSomos.jsx";
 
 export default function App() {
   return (
@@ -17,7 +18,7 @@ export default function App() {
       <Route path="/eventos" element={<TransEventos />} />
       <Route path="/contacto" element={<Contacto />} />
       <Route path="/privacidad" element={<Privacidad />} />
+      <Route path="/quienes-somos" element={<QuienesSomos />} />
     </Routes>
   );
 }
-
