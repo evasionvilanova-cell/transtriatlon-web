@@ -390,6 +390,8 @@ a{text-decoration:none;color:inherit}
           {t.nav.map(n => (
             n.id === "contacto-link" ? (
               <li key={n.id} onClick={() => { window.location.hash = "/contacto"; }}>{n.label}</li>
+            ) : n.id === "quienes-somos-link" ? (
+              <li key={n.id} onClick={() => { window.location.hash = "/quienes-somos"; }}>{n.label}</li>
             ) : (
               <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
             )
@@ -414,6 +416,8 @@ a{text-decoration:none;color:inherit}
         {t.nav.map(n => (
           n.id === "contacto-link" ? (
             <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/contacto"; }}>{n.label}</li>
+          ) : n.id === "quienes-somos-link" ? (
+            <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/quienes-somos"; }}>{n.label}</li>
           ) : (
             <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
           )
@@ -668,7 +672,7 @@ a{text-decoration:none;color:inherit}
               <li><a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a></li>
               <li><a href="tel:683542061">683 542 061</a></li>
               <li>Vilanova i la Geltrú</li>
-              <li onClick={() => window.location.hash = "/inscripcion"}>Formulario de Inscripción</li>
+              <li onClick={() => window.open("https://transtriatlon.com/formulario-de-inscripcion/", "_blank")}>Formulario de Inscripción</li>
             </ul>
           </div>
         </div>
