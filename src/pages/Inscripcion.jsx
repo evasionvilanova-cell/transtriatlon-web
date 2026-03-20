@@ -235,7 +235,7 @@ export default function Inscripcion() {
 
           <div className={`i-check ${form.autorizaImagenes ? "sel" : ""}`} onClick={() => set("autorizaImagenes", !form.autorizaImagenes)}>
             <div className="i-check-box">{form.autorizaImagenes ? "✓" : ""}</div>
-            <p>Autorizo a Transtriatlon al uso de las imágenes aceptando la <a href="https://transtriatlon.com/politica-de-privacidad/" target="_blank" rel="noreferrer">política de privacidad</a>. <span className="req">*</span></p>
+            <p>Autorizo a Transtriatlon al uso de las imágenes aceptando la <a href="#/privacidad" target="_blank" rel="noreferrer">política de privacidad</a>. <span className="req">*</span></p>
           </div>
 
           <button className="i-submit" onClick={handleSubmit} disabled={sending} style={{ marginTop: 20 }}>
