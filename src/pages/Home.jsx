@@ -542,7 +542,7 @@ a{text-decoration:none;color:inherit}
       </section>
 
       {/* ═══ ENTRENAMIENTOS ═══ */}
-      <section className="sec" id="entrenamientos" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+      <section className="sec sec-dark" id="entrenamientos">
         <div className="ctn">
           <Reveal><div className="sec-label">Entrenamientos</div></Reveal>
           <Reveal delay={0.05}><div className="sec-title">CÓMO ENTRENAMOS</div></Reveal>
