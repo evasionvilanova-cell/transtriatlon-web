@@ -541,6 +541,60 @@ a{text-decoration:none;color:inherit}
         </div>
       </section>
 
+      {/* ═══ ENTRENAMIENTOS ═══ */}
+      <section className="sec" id="entrenamientos" style={{ borderTop: "1px solid rgba(255,255,255,.06)" }}>
+        <div className="ctn">
+          <Reveal><div className="sec-label">Entrenamientos</div></Reveal>
+          <Reveal delay={0.05}><div className="sec-title">CÓMO ENTRENAMOS</div></Reveal>
+          <Reveal delay={0.1}><p className="sec-desc">Entrenamientos personalizados y grupales adaptados a cada deportista.</p></Reveal>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginTop: 32 }}>
+            <Reveal delay={0.15}>
+              <div style={{ padding: 28, borderRadius: 14, background: "rgba(232,30,30,.04)", border: "1px solid rgba(232,30,30,.1)" }}>
+                <h3 style={{ fontFamily: "var(--display)", fontSize: 20, letterSpacing: 1, marginBottom: 14, color: "var(--red)" }}>🎯 PERSONALES</h3>
+                <p style={{ fontSize: 14, lineHeight: 1.8, color: "rgba(255,255,255,.5)" }}>
+                  Planificaciones de entrenamientos personales adaptados individualmente a cada deportista, dependiendo de su nivel deportivo, objetivos, disponibilidad para entrenar, etc.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <div style={{ padding: 28, borderRadius: 14, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)" }}>
+                <h3 style={{ fontFamily: "var(--display)", fontSize: 20, letterSpacing: 1, marginBottom: 14, color: "#fff" }}>👥 GRUPALES</h3>
+                <p style={{ fontSize: 14, lineHeight: 1.8, color: "rgba(255,255,255,.5)", marginBottom: 8 }}>
+                  Son optativos. Los deportistas vienen cuando quieren y cuando pueden.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.25}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 16, marginTop: 24 }}>
+              {[
+                { icon: "🏊", title: "Natación en mar", desc: "En épocas que el clima lo permite, entrenamos en aguas abiertas simulando situaciones reales de competición." },
+                { icon: "🏊‍♂️", title: "Natación en piscina", desc: "Trabajamos técnica, resistencia y series." },
+                { icon: "🚴", title: "Ciclismo", desc: "Entrenamientos de técnica de pedaleo, rodajes en grupo y series." },
+                { icon: "🏃", title: "Carrera a pie", desc: "Entrenos en pistas de atletismo y Paseo Marítimo." },
+                { icon: "🔄", title: "Transiciones", desc: "Entrenamientos específicos para cambiar de un deporte a otro con la máxima eficacia." },
+                { icon: "💪", title: "Musculación", desc: "Entrenamientos generales y funcionales orientados a mejorar fuerza, resistencia, coordinación y agilidad." },
+                { icon: "🏅", title: "Combinados", desc: "Natación y carrera, bici y carrera, simulaciones de triatlones, duatlones y acuatlones." },
+              ].map((item) => (
+                <div key={item.title} style={{ padding: 20, borderRadius: 12, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.05)", transition: "all .25s" }}>
+                  <div style={{ fontSize: 24, marginBottom: 8 }}>{item.icon}</div>
+                  <h4 style={{ fontFamily: "var(--display)", fontSize: 15, letterSpacing: 1, marginBottom: 8 }}>{item.title}</h4>
+                  <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,.4)" }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.3}>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,.35)", marginTop: 20, lineHeight: 1.7, fontStyle: "italic" }}>
+              Los contenidos de los entrenos grupales los pauta el Cuerpo Técnico, siguiendo una planificación según la época de la temporada, el clima y la luz solar.
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ CUOTAS ═══ */}
       <section className="sec" id="cuotas">
         <div className="ctn">
@@ -672,7 +726,8 @@ a{text-decoration:none;color:inherit}
               <li><a href="mailto:info@transtriatlon.com">info@transtriatlon.com</a></li>
               <li><a href="tel:683542061">683 542 061</a></li>
               <li>Vilanova i la Geltrú</li>
-              <li onClick={() => window.open("https://transtriatlon.com/formulario-de-inscripcion/", "_blank")}>Formulario de Inscripción</li>
+              <li onClick={() => window.location.hash = "/inscripcion"}>Formulario de Inscripción</li>
+              <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>🛒 Equipaciones</a></li>
             </ul>
           </div>
         </div>
