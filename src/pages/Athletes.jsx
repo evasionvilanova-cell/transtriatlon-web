@@ -26,7 +26,7 @@ export default function Athletes() {
     setError("");
     try {
       const snap = await getDoc(doc(db, "settings", "athleteCode"));
-      if (snap.exists() && snap.data().code === code) {
+      if (snap.exists() && (snap.data().code === code || snap.data().code2 === code)) {
         setAuthenticated(true);
         sessionStorage.setItem("tt-athlete-auth", "true");
       } else {
