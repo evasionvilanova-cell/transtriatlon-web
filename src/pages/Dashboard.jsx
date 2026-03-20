@@ -26,6 +26,8 @@ export default function Dashboard() {
   // Athlete code state
   const [athleteCode, setAthleteCode] = useState("");
   const [newCode, setNewCode] = useState("");
+  const [athleteCode2, setAthleteCode2] = useState("");
+  const [newCode2, setNewCode2] = useState("");
 
   // Banner state
   const [banner, setBanner] = useState({ text: "", cta: "", ctaLink: "" });
