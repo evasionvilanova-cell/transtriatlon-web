@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Inscripcion from "./pages/Inscripcion.jsx";
 import TransEventos from "./pages/TransEventos.jsx";
 import Contacto from "./pages/Contacto.jsx";
+import Privacidad from "./pages/Privacidad.jsx";
 
 export default function App() {
   return (
@@ -15,6 +16,8 @@ export default function App() {
       <Route path="/inscripcion" element={<Inscripcion />} />
       <Route path="/eventos" element={<TransEventos />} />
       <Route path="/contacto" element={<Contacto />} />
+      <Route path="/privacidad" element={<Privacidad />} />
     </Routes>
   );
 }
+
