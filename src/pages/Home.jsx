@@ -489,7 +489,7 @@ a{text-decoration:none;color:inherit}
         <div className="ctn">
           <Reveal><div className="sec-label">{t.events.label}</div></Reveal>
           <Reveal delay={0.05}><div className="sec-title">{t.events.title}</div></Reveal>
-          <Reveal delay={0.1}><p className="sec-desc">Competiciones organizadas por Transtriatlon en Vilanova i la Geltrú.</p></Reveal>
+          <Reveal delay={0.1}><p className="sec-desc">Competiciones organizadas por Transtriatlon.</p></Reveal>
           <div className="ev-grid">
             {events.filter(e => {
               if (!e.date) return true;
