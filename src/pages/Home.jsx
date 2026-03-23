@@ -33,11 +33,11 @@ const EVENTS_DEFAULT = [
 
 const PROGRAMS = [
   {
-    name: "Transtriatlon Funcional",
-    tag: "Todos los niveles",
-    desc: "Entrenamientos de musculación y funcional orientados a mejorar fuerza, resistencia, coordinación y agilidad específica del triatlón y duatlón. Sesiones grupales adaptadas a cada persona.",
-    icon: "💪",
-    accent: "#E81E1E",
+    name: "Transtriatlon Academy",
+    tag: "6 – 12 años",
+    desc: "Formación deportiva de base para niños y niñas. Ciclismo y carrera a pie en un entorno seguro, divertido y educativo con el objetivo de crear hábitos deportivos saludables.",
+    icon: "⭐",
+    accent: "#FF8C00", 
   },
   {
     name: "Transtriatlon Joven",
@@ -47,19 +47,19 @@ const PROGRAMS = [
     accent: "#FF4444",
   },
   {
-    name: "Transtriatlon Academy",
-    tag: "6 – 12 años",
-    desc: "Formación deportiva de base para niños y niñas. Ciclismo y carrera a pie en un entorno seguro, divertido y educativo con el objetivo de crear hábitos deportivos saludables.",
-    icon: "⭐",
-    accent: "#FF8C00",
-  },
-  {
     name: "Transtriatlon Adulto",
     tag: "18+ años (Junior en adelante)",
     desc: "Entrenamientos personalizados y grupales para adultos de todos los niveles. Natación, ciclismo, carrera a pie y funcional. Planificaciones adaptadas a tus objetivos y disponibilidad.",
     icon: "🏃",
     accent: "#C41414",
   },
+  {
+    name: "Transtriatlon Funcional",
+    tag: "Todos los niveles",
+    desc: "Entrenamientos de musculación y funcional orientados a mejorar fuerza, resistencia, coordinación y agilidad específica del triatlón y duatlón. Sesiones grupales adaptadas a cada persona.",
+    icon: "💪",
+    accent: "#E81E1E",
+   },
 ];
 
 const CUOTAS = [
