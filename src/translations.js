@@ -30,10 +30,10 @@ const T = {
       title: "ENTRENA CON NOSOTROS",
       desc: "Programas adaptados a cada edad y nivel deportivo.",
       items: [
-        { name: "Transtriatlon Funcional", tag: "Todos los niveles", desc: "Entrenamientos de musculación y funcional orientados a mejorar fuerza, resistencia, coordinación y agilidad específica del triatlón y duatlón." },
-        { name: "Transtriatlon Joven", tag: "12 – 17 años", desc: "Programa para jóvenes que quieren iniciarse o progresar en triatlón. Natación, ciclismo, carrera a pie y funcional con entrenadores titulados." },
-        { name: "Transtriatlon Academy", tag: "6 – 12 años", desc: "Formación deportiva de base para niños y niñas. Ciclismo y carrera a pie en un entorno seguro, divertido y educativo." },
-        { name: "Transtriatlon Adulto", tag: "18+ años", desc: "Entrenamientos personalizados y grupales para adultos de todos los niveles. Natación, ciclismo, carrera a pie y funcional." },
+        { name: "Transtriatlon Academy", tag: "6 – 12 años", desc: "Formación deportiva de base para niños y niñas. Ciclismo y carrera a pie en un entorno seguro, divertido y educativo con el objetivo de crear hábitos deportivos saludables." },
+        { name: "Transtriatlon Joven", tag: "12 – 17 años", desc: "Programa para jóvenes que quieren iniciarse o progresar en triatlón. Natación, ciclismo, carrera a pie y funcional con entrenadores titulados especializados en formación juvenil." },
+        { name: "Transtriatlon Adulto", tag: "18+ años (Junior en adelante)", desc: "Entrenamientos personalizados y grupales para adultos de todos los niveles. Natación, ciclismo, carrera a pie y funcional. Planificaciones adaptadas a tus objetivos y disponibilidad." },
+        { name: "Transtriatlon Funcional", tag: "Todos los niveles", desc: "Entrenamientos de musculación y funcional orientados a mejorar fuerza, resistencia, coordinación y agilidad específica del triatlón y duatlón. Sesiones grupales adaptadas a cada persona." },
       ],
     },
     cuotas: {
@@ -41,8 +41,8 @@ const T = {
       title: "¿QUÉ INCLUYE CADA CUOTA?",
       desc: "Todas las cuotas incluyen matrícula de 40€ (un solo pago al darse de alta).",
       items: [
-        { name: "Adulto", age: "A partir de 18 años", activities: ["Natación", "Ciclismo", "Carrera a pie", "Funcional"], includes: ["Entrenamientos semanales en grupo dirigidos", "Acceso a instalaciones (15' antes y después)", "Pautas de entrenamiento semanales", "Subvención 50% Licencia Federativa*", "Camiseta técnica de regalo", "Descuentos en eventos y tiendas colaboradoras"], note: "*Desde la 2ª temporada, compitiendo en 5 pruebas de Liga/Copa Catalana. Excepto cuotas de 1 actividad y Externo.", featured: true },
-        { name: "Joven", age: "12 – 17 años", activities: ["Natación", "Ciclismo", "Carrera a pie", "Funcional"], includes: ["Entrenamientos semanales en grupo dirigidos", "Acceso a instalaciones (15' antes y después)", "Pautas de entrenamiento semanales", "Subvención 50% Licencia Federativa*", "Camiseta técnica de regalo", "Descuentos en eventos y tiendas colaboradoras"], note: "*Mismas condiciones que Adulto.", featured: false },
+        { name: "Adulto", age: "A partir de 18 años", activities: ["Natación", "Ciclismo", "Carrera a pie", "Funcional"], includes: ["Entrenamientos semanales en grupo dirigidos", "Acceso a instalaciones (15' antes y después)", "Pautas de entrenamiento semanales", "Camiseta técnica de regalo", "Descuentos en eventos y tiendas colaboradoras"], note: null, featured: true },
+        { name: "Joven", age: "12 – 17 años", activities: ["Natación", "Ciclismo", "Carrera a pie", "Funcional"], includes: ["Entrenamientos semanales en grupo dirigidos", "Acceso a instalaciones (15' antes y después)", "Pautas de entrenamiento semanales", "Camiseta técnica de regalo", "Descuentos en eventos y tiendas colaboradoras"], note: "*Mismas condiciones que Adulto.", featured: false },
         { name: "Academy", age: "6 – 12 años", activities: ["Ciclismo", "Carrera a pie"], includes: ["2 entrenamientos semanales en grupo dirigidos", "Acceso a instalaciones (15' antes y después)", "Camiseta técnica de regalo", "Descuentos en eventos y tiendas colaboradoras"], note: null, featured: false },
         { name: "Externo No Presencial", age: "Adulto", activities: ["1 entreno mensual presencial"], includes: ["1 entrenamiento mensual en grupo dirigido", "Pautas de entrenamiento semanales", "Camiseta técnica de regalo", "Descuentos en eventos y tiendas"], note: "No acumulable, personal e intransferible.", featured: false },
       ],
@@ -102,10 +102,10 @@ const T = {
       title: "ENTRENA AMB NOSALTRES",
       desc: "Programes adaptats a cada edat i nivell esportiu.",
       items: [
-        { name: "Transtriatlon Funcional", tag: "Tots els nivells", desc: "Entrenaments de musculació i funcional orientats a millorar força, resistència, coordinació i agilitat específica del triatló i duatló." },
-        { name: "Transtriatlon Jove", tag: "12 – 17 anys", desc: "Programa per a joves que volen iniciar-se o progressar en triatló. Natació, ciclisme, cursa a peu i funcional amb entrenadors titulats." },
-        { name: "Transtriatlon Academy", tag: "6 – 12 anys", desc: "Formació esportiva de base per a nens i nenes. Ciclisme i cursa a peu en un entorn segur, divertit i educatiu." },
-        { name: "Transtriatlon Adult", tag: "18+ anys", desc: "Entrenaments personalitzats i grupals per a adults de tots els nivells. Natació, ciclisme, cursa a peu i funcional." },
+        { name: "Transtriatlon Academy", tag: "6 – 12 anys", desc: "Formació esportiva de base per a nens i nenes. Ciclisme i cursa a peu en un entorn segur, divertit i educatiu amb l'objectiu de crear hàbits esportius saludables." },
+        { name: "Transtriatlon Jove", tag: "12 – 17 anys", desc: "Programa per a joves que volen iniciar-se o progressar en triatló. Natació, ciclisme, cursa a peu i funcional amb entrenadors titulats especialitzats en formació juvenil." },
+        { name: "Transtriatlon Adult", tag: "18+ anys (Júnior en endavant)", desc: "Entrenaments personalitzats i grupals per a adults de tots els nivells. Natació, ciclisme, cursa a peu i funcional. Planificacions adaptades als teus objectius i disponibilitat." },
+        { name: "Transtriatlon Funcional", tag: "Tots els nivells", desc: "Entrenaments de musculació i funcional orientats a millorar força, resistència, coordinació i agilitat específica del triatló i duatló. Sessions grupals adaptades a cada persona." },
       ],
     },
     cuotas: {
@@ -113,8 +113,8 @@ const T = {
       title: "QUÈ INCLOU CADA QUOTA?",
       desc: "Totes les quotes inclouen matrícula de 40€ (un sol pagament en donar-se d'alta).",
       items: [
-        { name: "Adult", age: "A partir de 18 anys", activities: ["Natació", "Ciclisme", "Cursa a peu", "Funcional"], includes: ["Entrenaments setmanals en grup dirigits", "Accés a instal·lacions (15' abans i després)", "Pautes d'entrenament setmanals", "Subvenció 50% Llicència Federativa*", "Samarreta tècnica de regal", "Descomptes en esdeveniments i botigues col·laboradores"], note: "*Des de la 2a temporada, competint en 5 proves de Lliga/Copa Catalana. Excepte quotes d'1 activitat i Extern.", featured: true },
-        { name: "Jove", age: "12 – 17 anys", activities: ["Natació", "Ciclisme", "Cursa a peu", "Funcional"], includes: ["Entrenaments setmanals en grup dirigits", "Accés a instal·lacions (15' abans i després)", "Pautes d'entrenament setmanals", "Subvenció 50% Llicència Federativa*", "Samarreta tècnica de regal", "Descomptes en esdeveniments i botigues col·laboradores"], note: "*Mateixes condicions que Adult.", featured: false },
+        { name: "Adult", age: "A partir de 18 anys", activities: ["Natació", "Ciclisme", "Cursa a peu", "Funcional"], includes: ["Entrenaments setmanals en grup dirigits", "Accés a instal·lacions (15' abans i després)", "Pautes d'entrenament setmanals", "Samarreta tècnica de regal", "Descomptes en esdeveniments i botigues col·laboradores"], note: null, featured: true },
+        { name: "Jove", age: "12 – 17 anys", activities: ["Natació", "Ciclisme", "Cursa a peu", "Funcional"], includes: ["Entrenaments setmanals en grup dirigits", "Accés a instal·lacions (15' abans i després)", "Pautes d'entrenament setmanals", "Samarreta tècnica de regal", "Descomptes en esdeveniments i botigues col·laboradores"], note: "*Mateixes condicions que Adult.", featured: false },
         { name: "Academy", age: "6 – 12 anys", activities: ["Ciclisme", "Cursa a peu"], includes: ["2 entrenaments setmanals en grup dirigits", "Accés a instal·lacions (15' abans i després)", "Samarreta tècnica de regal", "Descomptes en esdeveniments i botigues col·laboradores"], note: null, featured: false },
         { name: "Extern No Presencial", age: "Adult", activities: ["1 entrenament mensual presencial"], includes: ["1 entrenament mensual en grup dirigit", "Pautes d'entrenament setmanals", "Samarreta tècnica de regal", "Descomptes en esdeveniments i botigues"], note: "No acumulable, personal i intransferible.", featured: false },
       ],
@@ -174,10 +174,10 @@ const T = {
       title: "TRAIN WITH US",
       desc: "Programs adapted to every age and fitness level.",
       items: [
-        { name: "Transtriatlon Functional", tag: "All levels", desc: "Strength and functional training designed to improve power, endurance, coordination and triathlon-specific agility." },
-        { name: "Transtriatlon Youth", tag: "12 – 17 years", desc: "Program for young athletes looking to start or progress in triathlon. Swimming, cycling, running and functional training with certified coaches." },
-        { name: "Transtriatlon Academy", tag: "6 – 12 years", desc: "Foundation sports training for children. Cycling and running in a safe, fun and educational environment." },
-        { name: "Transtriatlon Adult", tag: "18+ years", desc: "Personalized and group training for adults of all levels. Swimming, cycling, running and functional training." },
+        { name: "Transtriatlon Academy", tag: "6 – 12 years", desc: "Foundation sports training for children. Cycling and running in a safe, fun and educational environment to build healthy sporting habits." },
+        { name: "Transtriatlon Youth", tag: "12 – 17 years", desc: "Program for young athletes looking to start or progress in triathlon. Swimming, cycling, running and functional training with certified coaches specialized in youth development." },
+        { name: "Transtriatlon Adult", tag: "18+ years (Junior onwards)", desc: "Personalized and group training for adults of all levels. Swimming, cycling, running and functional training. Plans adapted to your goals and availability." },
+        { name: "Transtriatlon Functional", tag: "All levels", desc: "Strength and functional training designed to improve power, endurance, coordination and triathlon-specific agility. Group sessions adapted to each person." },
       ],
     },
     cuotas: {
@@ -185,8 +185,8 @@ const T = {
       title: "WHAT'S INCLUDED?",
       desc: "All memberships include a one-time 40€ registration fee.",
       items: [
-        { name: "Adult", age: "18 years and over", activities: ["Swimming", "Cycling", "Running", "Functional"], includes: ["Weekly guided group training sessions", "Facility access (15 min before and after)", "Weekly training guidelines", "50% Federation License subsidy*", "Free technical t-shirt", "Discounts on events and partner shops"], note: "*From the 2nd season, competing in 5 League/Catalan Cup events. Except 1-activity and External memberships.", featured: true },
-        { name: "Youth", age: "12 – 17 years", activities: ["Swimming", "Cycling", "Running", "Functional"], includes: ["Weekly guided group training sessions", "Facility access (15 min before and after)", "Weekly training guidelines", "50% Federation License subsidy*", "Free technical t-shirt", "Discounts on events and partner shops"], note: "*Same conditions as Adult.", featured: false },
+        { name: "Adult", age: "18 years and over", activities: ["Swimming", "Cycling", "Running", "Functional"], includes: ["Weekly guided group training sessions", "Facility access (15 min before and after)", "Weekly training guidelines", "Free technical t-shirt", "Discounts on events and partner shops"], note: null, featured: true },
+        { name: "Youth", age: "12 – 17 years", activities: ["Swimming", "Cycling", "Running", "Functional"], includes: ["Weekly guided group training sessions", "Facility access (15 min before and after)", "Weekly training guidelines", "Free technical t-shirt", "Discounts on events and partner shops"], note: "*Same conditions as Adult.", featured: false },
         { name: "Academy", age: "6 – 12 years", activities: ["Cycling", "Running"], includes: ["2 weekly guided group training sessions", "Facility access (15 min before and after)", "Free technical t-shirt", "Discounts on events and partner shops"], note: null, featured: false },
         { name: "External Non-Presential", age: "Adult", activities: ["1 monthly in-person session"], includes: ["1 monthly guided group training session", "Weekly training guidelines", "Free technical t-shirt", "Discounts on events and shops"], note: "Non-cumulative, personal and non-transferable.", featured: false },
       ],
