@@ -71,12 +71,10 @@ const CUOTAS = [
       "Entrenamientos semanales en grupo dirigidos",
       "Acceso a instalaciones (15' antes y después)",
       "Pautas de entrenamiento semanales",
-      "Subvención 50% Licencia Federativa*",
       "Camiseta técnica de regalo",
       "Descuentos en eventos y tiendas colaboradoras",
     ],
-    note: "*Desde la 2ª temporada, compitiendo en 5 pruebas de Liga/Copa Catalana. Excepto cuotas de 1 actividad y Externo.",
-    featured: true,
+   
   },
   {
     name: "Joven",
@@ -86,7 +84,6 @@ const CUOTAS = [
       "Entrenamientos semanales en grupo dirigidos",
       "Acceso a instalaciones (15' antes y después)",
       "Pautas de entrenamiento semanales",
-      "Subvención 50% Licencia Federativa*",
       "Camiseta técnica de regalo",
       "Descuentos en eventos y tiendas colaboradoras",
     ],
