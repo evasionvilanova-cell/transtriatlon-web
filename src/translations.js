@@ -1,7 +1,6 @@
 const T = {
   es: {
     nav: [
-      { label: "Inicio", id: "hero" },
       { label: "Quiénes Somos", id: "quienes-somos-link" },
       { label: "Eventos", id: "events" },
       { label: "Programas", id: "programs" },
@@ -73,7 +72,6 @@ const T = {
   },
   ca: {
     nav: [
-      { label: "Inici", id: "hero" },
       { label: "Qui Som", id: "quienes-somos-link" },
       { label: "Esdeveniments", id: "events" },
       { label: "Programes", id: "programs" },
@@ -145,7 +143,6 @@ const T = {
   },
   en: {
     nav: [
-      { label: "Home", id: "hero" },
       { label: "About Us", id: "quienes-somos-link" },
       { label: "Events", id: "events" },
       { label: "Programs", id: "programs" },
