@@ -139,13 +139,13 @@ const TARIFAS = {
 };
 
 const SPONSORS = [
-  { name: "Federació Catalana de Triatló", logo: "https://drive.google.com/file/d/1qmzJhH8G3Du8fXv9mWRRih27JWPGPFhc/view?usp=sharing" },
-  { name: "El Surtidor", logo: "https://drive.google.com/file/d/1QXjsU718kijLvfFoIg93O2lW36byyO2Y/view?usp=sharing" },
-  { name: "Ajuntament de Vilanova i la Geltrú", logo: "https://drive.google.com/file/d/1VVAyVYbzR_Al2C102M8kTeCse7dE_QcG/view?usp=drive_link" },
-  { name: "Evasion Running", logo: "https://drive.google.com/file/d/1ip0OXBi-tHg_upnHAxe0lGauRa4ap5L4/view?usp=sharing" },
-  { name: "Escuela de la memoria", logo: "https://drive.google.com/file/d/18nx3N8nPqj0pxtGFOK2Yg761gt_CLxgk/view?usp=sharing" },
-  { name: "Alfaro", logo: "https://drive.google.com/file/d/1VVAyVYbzR_Al2C102M8kTeCse7dE_QcG/view?usp=drive_link" },
-  { name: "TransNaigo", logo: "https://drive.google.com/file/d/1SxRNnl92HcItlaXr_04M5d_YxU3YWgAH/view?usp=sharing" },
+  { name: "Federació Catalana de Triatló", logo: "https://lh3.googleusercontent.com/d/1qmzJhH8G3Du8fXv9mWRRih27JWPGPFhc" },
+  { name: "El Surtidor", logo: "https://lh3.googleusercontent.com/d/1QXjsU718kijLvfFoIg93O2lW36byyO2Y" },
+  { name: "Ajuntament de Vilanova i la Geltrú", logo: "https://lh3.googleusercontent.com/d/19HOBD4Xg66beNHjCcJVSGA16qBd7Tdbd" },
+  { name: "Evasion Running", logo: "https://lh3.googleusercontent.com/d/1ip0OXBi-tHg_upnHAxe0lGauRa4ap5L4" },
+  { name: "Escuela de la memoria", logo: "https://lh3.googleusercontent.com/d/18nx3N8nPqj0pxtGFOK2Yg761gt_CLxgk" },
+  { name: "Alfaro", logo: "https://lh3.googleusercontent.com/d/1VVAyVYbzR_Al2C102M8kTeCse7dE_QcG" },
+  { name: "TransNaigo", logo: "https://lh3.googleusercontent.com/d/1SxRNnl92HcItlaXr_04M5d_YxU3YWgAH" },
 ];
 
 const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
