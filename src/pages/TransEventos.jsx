@@ -86,7 +86,7 @@ export default function TransEventos() {
         .te-detail{max-width:800px;margin:0 auto;padding:0 clamp(16px,4vw,48px) 80px}
         .te-detail-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:24px;transition:color .2s}
         .te-detail-back:hover{color:var(--red)}
-        .te-detail-img{width:100%;border-radius:var(--r);overflow:hidden;margin-bottom:32px}
+        .te-detail-img{width:100%;max-width:500px;border-radius:var(--r);overflow:hidden;margin-bottom:32px}
         .te-detail-img img{width:100%;height:auto;display:block}
         .te-detail h1{font-family:var(--display);font-size:clamp(36px,5vw,56px);letter-spacing:2px;line-height:1;margin-bottom:8px}
         .te-detail-meta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px}
@@ -191,7 +191,13 @@ export default function TransEventos() {
             </div>
 
             {selected.description && (
-              <div className="te-detail-desc">{selected.description}</div>
+              <div className="te-detail-desc">
+                {selected.description.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                  /^https?:\/\//.test(part) ? (
+                    <a key={i} href={part} target="_blank" rel="noreferrer" style={{ color: "var(--red)", wordBreak: "break-all" }}>{part}</a>
+                  ) : part
+                )}
+              </div>
             )}
 
             {(selected.reglamentoUrl || selected.inscripcionUrl || selected.resultadosUrl) && (
