@@ -148,7 +148,7 @@ const SPONSORS = [
   { name: "TransNaigo", logo: "https://lh3.googleusercontent.com/d/11FN4xETw_jX2KqtyA6Y_t5Nhv4fE7E8S" },
 ];
 
-const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
+const LOGO = "https://lh3.googleusercontent.com/d/1k4Vbce4KpniDHESGgsp-FJ-9k1WIX8Iy";
 
 /* ═══════════════════════════════════════════
    HOOKS
