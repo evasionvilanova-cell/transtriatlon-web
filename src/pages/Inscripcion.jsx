@@ -4,7 +4,7 @@ import { db } from "../firebase.js";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import "../styles.css";
 
-const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
+const LOGO = "https://lh3.googleusercontent.com/d/1k4Vbce4KpniDHESGgsp-FJ-9k1WIX8Iy";
 
 const CUOTA_OPTIONS = [
   "1 ACTIVIDAD (JÓVEN O ADULTO)",
