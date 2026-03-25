@@ -4,7 +4,7 @@ import { db } from "../firebase.js";
 import { collection, query, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import "../styles.css";
 
-const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
+const LOGO = "https://lh3.googleusercontent.com/d/1k4Vbce4KpniDHESGgsp-FJ-9k1WIX8Iy";
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop";
 
 export default function TransEventos() {
