@@ -254,7 +254,7 @@ a{text-decoration:none;color:inherit}
 .hdr-logo img{height:38px}
 .hdr-logo span{font-family:var(--display);font-size:22px;letter-spacing:3px;color:var(--text)}
 .hdr-nav{display:flex;align-items:center;gap:28px;list-style:none}
-.hdr-nav li{font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--text2);cursor:pointer;transition:color .25s;position:relative}
+.hdr-nav li{font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--text2);cursor:pointer;transition:color .25s;position:relative;white-space:nowrap}
 .hdr-nav li:hover{color:var(--red)}
 .hdr-cta{padding:10px 24px;border-radius:100px;background:var(--red);color:#fff;font-size:13px;font-weight:600;letter-spacing:.5px;border:none;cursor:pointer;transition:all .25s;font-family:var(--font)}
 .hdr-cta:hover{background:var(--red-l);transform:translateY(-1px);box-shadow:0 6px 20px var(--red-glow)}
