@@ -10,7 +10,6 @@ import T from "../translations.js";
    ═══════════════════════════════════════════ */
 
 const NAV_LINKS = [
-  { label: "Inicio", id: "hero" },
   { label: "Eventos", id: "events" },
   { label: "Programas", id: "programs" },
   { label: "Cuotas", id: "cuotas" },
