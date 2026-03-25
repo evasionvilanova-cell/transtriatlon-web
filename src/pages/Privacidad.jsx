@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "../styles.css";
 
-const LOGO = "https://transtriatlon.com/wp-content/uploads/2017/11/Transtriatlón-fondo-blanco.png";
+const LOGO = "https://lh3.googleusercontent.com/d/1k4Vbce4KpniDHESGgsp-FJ-9k1WIX8Iy";
 
 export default function Privacidad() {
   return (
