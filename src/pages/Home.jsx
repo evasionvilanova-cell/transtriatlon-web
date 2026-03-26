@@ -392,7 +392,7 @@ a{text-decoration:none;color:inherit}
             )
           ))}
           <li>
-            <a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none", fontWeight: 600 }}>🛒 Equipaciones</a>
+            <a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none", fontWeight: 600 }}>{t.equipaciones}</a>
           </li>
           <li>
             <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>{t.accesoAtletas}</Link>
@@ -420,7 +420,7 @@ a{text-decoration:none;color:inherit}
             <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
           )
         ))}
-        <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>🛒 Equipaciones</a></li>
+        <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>{t.equipaciones}</a></li>
         <li onClick={() => { setMenu(false); window.location.hash = "/atletas"; }}>{t.accesoAtletas}</li>
         <li onClick={() => { setMenu(false); window.location.hash = "/inscripcion"; }} style={{ color: "var(--red)" }}>{t.inscribete}</li>
         <li style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
