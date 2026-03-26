@@ -392,6 +392,9 @@ a{text-decoration:none;color:inherit}
             )
           ))}
           <li>
+            <a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none", fontWeight: 600 }}>🛒 Equipaciones</a>
+          </li>
+          <li>
             <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>{t.accesoAtletas}</Link>
           </li>
           <li>
@@ -417,6 +420,7 @@ a{text-decoration:none;color:inherit}
             <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
           )
         ))}
+        <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>🛒 Equipaciones</a></li>
         <li onClick={() => { setMenu(false); window.location.hash = "/atletas"; }}>{t.accesoAtletas}</li>
         <li onClick={() => { setMenu(false); window.location.hash = "/inscripcion"; }} style={{ color: "var(--red)" }}>{t.inscribete}</li>
         <li style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
@@ -722,7 +726,6 @@ a{text-decoration:none;color:inherit}
               <li><a href="tel:683542061">683 542 061</a></li>
               <li>Vilanova i la Geltrú</li>
               <li onClick={() => window.location.hash = "/inscripcion"}>Formulario de Inscripción</li>
-              <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>🛒 Equipaciones</a></li>
             </ul>
           </div>
         </div>
