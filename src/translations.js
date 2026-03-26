@@ -9,6 +9,7 @@ const T = {
       { label: "Contacto", id: "contacto-link" },
     ],
     accesoAtletas: "Acceso Atletas",
+    equipaciones: "🛒 Equipaciones",
     inscribete: "Inscríbete",
     hero: {
       label: "Club de Triatlón · Vilanova i la Geltrú",
@@ -80,6 +81,7 @@ const T = {
       { label: "Contacte", id: "contacto-link" },
     ],
     accesoAtletas: "Accés Atletes",
+    equipaciones: "🛒 Equipaments",
     inscribete: "Inscriu-te",
     hero: {
       label: "Club de Triatló · Vilanova i la Geltrú",
@@ -151,6 +153,7 @@ const T = {
       { label: "Contact", id: "contacto-link" },
     ],
     accesoAtletas: "Athlete Access",
+    equipaciones: "🛒 Kit Shop",
     inscribete: "Join Us",
     hero: {
       label: "Triathlon Club · Vilanova i la Geltrú",
