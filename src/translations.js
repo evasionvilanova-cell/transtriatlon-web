@@ -1,7 +1,9 @@
 const T = {
   es: {
     nav: [
+      { label: "Inicio", id: "hero" },
       { label: "Quiénes Somos", id: "quienes-somos-link" },
+      { label: "Horarios", id: "horarios-link" },
       { label: "Eventos", id: "events" },
       { label: "Programas", id: "programs" },
       { label: "Cuotas", id: "cuotas" },
@@ -9,7 +11,6 @@ const T = {
       { label: "Contacto", id: "contacto-link" },
     ],
     accesoAtletas: "Acceso Atletas",
-    equipaciones: "🛒 Equipaciones",
     inscribete: "Inscríbete",
     hero: {
       label: "Club de Triatlón · Vilanova i la Geltrú",
@@ -73,7 +74,9 @@ const T = {
   },
   ca: {
     nav: [
+      { label: "Inici", id: "hero" },
       { label: "Qui Som", id: "quienes-somos-link" },
+      { label: "Horaris", id: "horarios-link" },
       { label: "Esdeveniments", id: "events" },
       { label: "Programes", id: "programs" },
       { label: "Quotes", id: "cuotas" },
@@ -81,7 +84,6 @@ const T = {
       { label: "Contacte", id: "contacto-link" },
     ],
     accesoAtletas: "Accés Atletes",
-    equipaciones: "🛒 Equipaments",
     inscribete: "Inscriu-te",
     hero: {
       label: "Club de Triatló · Vilanova i la Geltrú",
@@ -145,7 +147,9 @@ const T = {
   },
   en: {
     nav: [
+      { label: "Home", id: "hero" },
       { label: "About Us", id: "quienes-somos-link" },
+      { label: "Schedule", id: "horarios-link" },
       { label: "Events", id: "events" },
       { label: "Programs", id: "programs" },
       { label: "Memberships", id: "cuotas" },
@@ -153,7 +157,6 @@ const T = {
       { label: "Contact", id: "contacto-link" },
     ],
     accesoAtletas: "Athlete Access",
-    equipaciones: "🛒 Kit Shop",
     inscribete: "Join Us",
     hero: {
       label: "Triathlon Club · Vilanova i la Geltrú",
