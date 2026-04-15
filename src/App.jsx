@@ -7,6 +7,7 @@ import TransEventos from "./pages/TransEventos.jsx";
 import Contacto from "./pages/Contacto.jsx";
 import Privacidad from "./pages/Privacidad.jsx";
 import QuienesSomos from "./pages/QuienesSomos.jsx";
+import Horarios from "./pages/Horarios.jsx";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
       <Route path="/contacto" element={<Contacto />} />
       <Route path="/privacidad" element={<Privacidad />} />
       <Route path="/quienes-somos" element={<QuienesSomos />} />
+      <Route path="/horarios" element={<Horarios />} />
     </Routes>
   );
 }
