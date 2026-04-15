@@ -10,6 +10,7 @@ import T from "../translations.js";
    ═══════════════════════════════════════════ */
 
 const NAV_LINKS = [
+  { label: "Inicio", id: "hero" },
   { label: "Eventos", id: "events" },
   { label: "Programas", id: "programs" },
   { label: "Cuotas", id: "cuotas" },
@@ -253,8 +254,8 @@ a{text-decoration:none;color:inherit}
 .hdr-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
 .hdr-logo img{height:38px}
 .hdr-logo span{font-family:var(--display);font-size:22px;letter-spacing:3px;color:var(--text)}
-.hdr-nav{display:flex;align-items:center;gap:20px;list-style:none}
-.hdr-nav li{font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--text2);cursor:pointer;transition:color .25s;position:relative;white-space:nowrap}
+.hdr-nav{display:flex;align-items:center;gap:28px;list-style:none}
+.hdr-nav li{font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--text2);cursor:pointer;transition:color .25s;position:relative}
 .hdr-nav li:hover{color:var(--red)}
 .hdr-cta{padding:10px 24px;border-radius:100px;background:var(--red);color:#fff;font-size:13px;font-weight:600;letter-spacing:.5px;border:none;cursor:pointer;transition:all .25s;font-family:var(--font)}
 .hdr-cta:hover{background:var(--red-l);transform:translateY(-1px);box-shadow:0 6px 20px var(--red-glow)}
@@ -387,13 +388,12 @@ a{text-decoration:none;color:inherit}
               <li key={n.id} onClick={() => { window.location.hash = "/contacto"; }}>{n.label}</li>
             ) : n.id === "quienes-somos-link" ? (
               <li key={n.id} onClick={() => { window.location.hash = "/quienes-somos"; }}>{n.label}</li>
+            ) : n.id === "horarios-link" ? (
+              <li key={n.id} onClick={() => { window.location.hash = "/horarios"; }}>{n.label}</li>
             ) : (
               <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
             )
           ))}
-          <li>
-            <a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none", fontWeight: 600 }}>{t.equipaciones}</a>
-          </li>
           <li>
             <Link to="/atletas" style={{ color: "inherit", textDecoration: "none" }}>{t.accesoAtletas}</Link>
           </li>
@@ -416,11 +416,12 @@ a{text-decoration:none;color:inherit}
             <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/contacto"; }}>{n.label}</li>
           ) : n.id === "quienes-somos-link" ? (
             <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/quienes-somos"; }}>{n.label}</li>
+          ) : n.id === "horarios-link" ? (
+            <li key={n.id} onClick={() => { setMenu(false); window.location.hash = "/horarios"; }}>{n.label}</li>
           ) : (
             <li key={n.id} onClick={() => go(n.id)}>{n.label}</li>
           )
         ))}
-        <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>{t.equipaciones}</a></li>
         <li onClick={() => { setMenu(false); window.location.hash = "/atletas"; }}>{t.accesoAtletas}</li>
         <li onClick={() => { setMenu(false); window.location.hash = "/inscripcion"; }} style={{ color: "var(--red)" }}>{t.inscribete}</li>
         <li style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
@@ -726,6 +727,7 @@ a{text-decoration:none;color:inherit}
               <li><a href="tel:683542061">683 542 061</a></li>
               <li>Vilanova i la Geltrú</li>
               <li onClick={() => window.location.hash = "/inscripcion"}>Formulario de Inscripción</li>
+              <li><a href="https://tienda.austral.es/transtriatlon/index.php" target="_blank" rel="noreferrer" style={{ color: "var(--red-l)", textDecoration: "none" }}>🛒 Equipaciones</a></li>
             </ul>
           </div>
         </div>
