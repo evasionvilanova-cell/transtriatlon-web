@@ -34,7 +34,7 @@ export default function Dashboard() {
 
   // Events state
   const [events, setEvents] = useState([]);
-  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" });
+  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", imagenesUrl: "" });
   const [editingEvent, setEditingEvent] = useState(null);
 
   // Ritmos state
@@ -159,18 +159,18 @@ export default function Dashboard() {
     try {
       if (editingEvent) { await setDoc(doc(db, "events", editingEvent.id), newEvent); setEditingEvent(null); setMsg("✅ Evento actualizado!"); }
       else { await addDoc(collection(db, "events"), newEvent); setMsg("✅ Evento añadido!"); }
-      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" });
+      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", imagenesUrl: "" });
       loadEvents();
     } catch (e) { setMsg("Error: " + e.message); }
   };
 
   const startEditEvent = (ev) => {
     setEditingEvent(ev);
-    setNewEvent({ title: ev.title || "", date: ev.date || "", type: ev.type || "Triatlón", imgUrl: ev.imgUrl || "", description: ev.description || "", reglamentoUrl: ev.reglamentoUrl || "", inscripcionUrl: ev.inscripcionUrl || "", resultadosUrl: ev.resultadosUrl || "" });
+    setNewEvent({ title: ev.title || "", date: ev.date || "", type: ev.type || "Triatlón", imgUrl: ev.imgUrl || "", description: ev.description || "", reglamentoUrl: ev.reglamentoUrl || "", inscripcionUrl: ev.inscripcionUrl || "", resultadosUrl: ev.resultadosUrl || "", imagenesUrl: ev.imagenesUrl || "" });
     setMsg("Editando: " + ev.title); window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const cancelEdit = () => { setEditingEvent(null); setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "" }); setMsg(""); };
+  const cancelEdit = () => { setEditingEvent(null); setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", imagenesUrl: "" }); setMsg(""); };
 
   const deleteEvent = async (ev) => {
     if (!confirm(`¿Eliminar "${ev.title}"?`)) return;
@@ -389,10 +389,11 @@ export default function Dashboard() {
               <div className="d-field"><label>Descripción del evento</label><textarea value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} placeholder="Recorrido, categorías, horarios, info relevante..." style={{ minHeight: 100 }} /></div>
               <div className="d-row"><div className="d-field"><label>Enlace reglamento (PDF / Google Drive)</label><input type="url" value={newEvent.reglamentoUrl} onChange={(e) => setNewEvent({ ...newEvent, reglamentoUrl: e.target.value })} placeholder="https://drive.google.com/..." /></div><div className="d-field"><label>Enlace inscripción al evento</label><input type="url" value={newEvent.inscripcionUrl} onChange={(e) => setNewEvent({ ...newEvent, inscripcionUrl: e.target.value })} placeholder="https://..." /></div></div>
               <div className="d-field"><label>Enlace resultados (URL o PDF Google Drive)</label><input type="url" value={newEvent.resultadosUrl} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl: e.target.value })} placeholder="https://..." /></div>
+              <div className="d-field"><label>Enlace galería de imágenes del evento</label><input type="url" value={newEvent.imagenesUrl} onChange={(e) => setNewEvent({ ...newEvent, imagenesUrl: e.target.value })} placeholder="https://photos.google.com/... o enlace al álbum" /></div>
               <button className="d-btn" onClick={saveEvent}>{editingEvent ? "💾 Guardar Cambios" : "➕ Añadir Evento"}</button>
             </div>
             <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>EVENTOS ({events.length})</h3>
-            {events.map(ev => (<div key={ev.id} className="d-list-item"><div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 200 }}>{ev.imgUrl && <img src={ev.imgUrl} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }} />}<div className="d-list-info"><h4>{ev.title}</h4><p>{ev.date} · {ev.type}{ev.resultadosUrl ? " · 📊 Resultados" : ""}</p></div></div><div style={{ display: "flex", gap: 8 }}><button className="d-btn d-btn-sm d-btn-ghost" onClick={() => startEditEvent(ev)}>✏️ Editar</button><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button></div></div>))}
+            {events.map(ev => (<div key={ev.id} className="d-list-item"><div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 200 }}>{ev.imgUrl && <img src={ev.imgUrl} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }} />}<div className="d-list-info"><h4>{ev.title}</h4><p>{ev.date} · {ev.type}{ev.resultadosUrl ? " · 📊 Resultados" : ""}{ev.imagenesUrl ? " · 📸 Imágenes" : ""}</p></div></div><div style={{ display: "flex", gap: 8 }}><button className="d-btn d-btn-sm d-btn-ghost" onClick={() => startEditEvent(ev)}>✏️ Editar</button><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button></div></div>))}
           </>)}
 
           {/* ── RITMOS TAB ── */}
