@@ -3,15 +3,12 @@ import { Link } from "react-router-dom";
 import { db } from "../firebase.js";
 import { collection, query, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import "../styles.css";
-
 const LOGO = "https://lh3.googleusercontent.com/d/1k4Vbce4KpniDHESGgsp-FJ-9k1WIX8Iy";
 const DEFAULT_IMG = "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop";
-
 export default function TransEventos() {
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const load = async () => {
       try {
@@ -23,12 +20,9 @@ export default function TransEventos() {
     };
     load();
   }, []);
-
   const parseDate = (dateStr) => {
     if (!dateStr) return null;
-    // Handle ISO format: 2025-12-28
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return new Date(dateStr + "T00:00:00");
-    // Handle text format
     const months = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setembre:8,octubre:9,noviembre:10,diciembre:11 };
     const parts = dateStr.toLowerCase().replace(/de /g, "").trim().split(/\s+/);
     for (const [name, idx] of Object.entries(months)) {
@@ -41,7 +35,6 @@ export default function TransEventos() {
     }
     return null;
   };
-
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
@@ -50,12 +43,10 @@ export default function TransEventos() {
     }
     return dateStr;
   };
-
   const now = new Date();
   now.setHours(0,0,0,0);
   const upcoming = events.filter(e => { const d = parseDate(e.date); return !d || d >= now; });
   const past = events.filter(e => { const d = parseDate(e.date); return d && d < now; }).reverse();
-
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
       <style>{`
@@ -65,12 +56,10 @@ export default function TransEventos() {
         .te-hdr-logo span{font-family:var(--display);font-size:18px;letter-spacing:2px;color:var(--text)}
         .te-back{padding:8px 18px;border-radius:100px;border:1px solid rgba(0,0,0,.1);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s;text-decoration:none}
         .te-back:hover{border-color:var(--red);color:var(--red)}
-
         .te-hero{padding:clamp(48px,8vw,80px) clamp(16px,4vw,48px) 32px;text-align:center}
         .te-hero-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
         .te-hero h1{font-family:var(--display);font-size:clamp(42px,7vw,80px);letter-spacing:2px;line-height:1}
         .te-hero p{font-size:16px;color:var(--text2);margin-top:12px;max-width:500px;margin-inline:auto}
-
         .te-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding:0 clamp(16px,4vw,48px) 80px;max-width:1200px;margin:0 auto}
         .te-card{border-radius:var(--r);overflow:hidden;background:#fff;border:1px solid rgba(0,0,0,.06);transition:all .35s;cursor:pointer}
         .te-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.08);border-color:rgba(232,30,30,.15)}
@@ -81,8 +70,6 @@ export default function TransEventos() {
         .te-card-body{padding:20px}
         .te-card-body h3{font-family:var(--display);font-size:24px;letter-spacing:1.5px}
         .te-card-body .date{font-size:13px;color:var(--text2);margin-top:4px}
-
-        /* DETAIL VIEW */
         .te-detail{max-width:800px;margin:0 auto;padding:0 clamp(16px,4vw,48px) 80px}
         .te-detail-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:24px;transition:color .2s}
         .te-detail-back:hover{color:var(--red)}
@@ -100,11 +87,9 @@ export default function TransEventos() {
         .te-doc-link:hover{background:var(--red);color:#fff;border-color:var(--red)}
         .te-inscripcion{display:inline-flex;align-items:center;gap:8px;padding:16px 32px;border-radius:100px;background:var(--red);color:#fff;font-size:15px;font-weight:700;text-decoration:none;transition:all .25s;letter-spacing:.5px}
         .te-inscripcion:hover{background:var(--red-l);transform:translateY(-2px);box-shadow:0 8px 24px var(--red-glow)}
-
         .te-loading{text-align:center;padding:80px;color:var(--text2)}
         .te-empty{text-align:center;padding:80px;color:var(--text2);font-size:15px}
       `}</style>
-
       <div className="te-hdr">
         <Link to="/" className="te-hdr-logo">
           <img src={LOGO} alt="T" />
@@ -112,7 +97,6 @@ export default function TransEventos() {
         </Link>
         <Link to="/" className="te-back">← Volver</Link>
       </div>
-
       {!selected ? (
         <>
           <div className="te-hero">
@@ -120,7 +104,6 @@ export default function TransEventos() {
             <h1>COMPETICIONES Y EVENTOS</h1>
             <p>Descubre todas las competiciones organizadas por Transtriatlon en Vilanova i la Geltrú.</p>
           </div>
-
           {loading ? (
             <div className="te-loading">Cargando eventos...</div>
           ) : events.length === 0 ? (
@@ -177,19 +160,16 @@ export default function TransEventos() {
         <div style={{ paddingTop: 40 }}>
           <div className="te-detail">
             <div className="te-detail-back" onClick={() => setSelected(null)}>← Volver a todos los eventos</div>
-
             {selected.imgUrl && (
               <div className="te-detail-img">
                 <img src={selected.imgUrl} alt={selected.title} />
               </div>
             )}
-
             <h1>{selected.title}</h1>
             <div className="te-detail-meta">
               <span className="te-detail-tag type">{selected.type}</span>
               <span className="te-detail-tag date">{formatDate(selected.date)}</span>
             </div>
-
             {selected.description && (
               <div className="te-detail-desc">
                 {selected.description.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
@@ -199,8 +179,7 @@ export default function TransEventos() {
                 )}
               </div>
             )}
-
-            {(selected.reglamentoUrl || selected.inscripcionUrl || selected.resultadosUrl) && (
+            {(selected.reglamentoUrl || selected.inscripcionUrl || selected.resultadosUrl || selected.imagenesUrl) && (
               <div className="te-detail-docs">
                 <h3>DOCUMENTOS Y ENLACES</h3>
                 {selected.reglamentoUrl && (
@@ -213,6 +192,11 @@ export default function TransEventos() {
                     📊 Resultados
                   </a>
                 )}
+                {selected.imagenesUrl && (
+                  <a href={selected.imagenesUrl} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,100,255,.06)", borderColor: "rgba(0,100,255,.15)", color: "#0066cc" }}>
+                    📸 Galería de imágenes
+                  </a>
+                )}
                 {selected.inscripcionUrl && (
                   <a href={selected.inscripcionUrl} target="_blank" rel="noreferrer" className="te-inscripcion">
                     🏁 Inscríbete en este evento
@@ -220,8 +204,7 @@ export default function TransEventos() {
                 )}
               </div>
             )}
-
-            {!selected.description && !selected.reglamentoUrl && !selected.inscripcionUrl && !selected.resultadosUrl && (
+            {!selected.description && !selected.reglamentoUrl && !selected.inscripcionUrl && !selected.resultadosUrl && !selected.imagenesUrl && (
               <p style={{ color: "var(--text2)", fontSize: 15, marginTop: 16 }}>
                 Próximamente más información sobre este evento. Contacta con nosotros para más detalles.
               </p>
