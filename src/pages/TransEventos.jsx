@@ -192,16 +192,11 @@ export default function TransEventos() {
                     📊 Resultados
                   </a>
                 )}
-                {selected.imagenesUrl && (
-                  <a href={selected.imagenesUrl} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,100,255,.06)", borderColor: "rgba(0,100,255,.15)", color: "#0066cc" }}>
-                    📸 Galería de imágenes
+               {selected.imagenesUrl && selected.imagenesUrl.split(",").map((url, i) => (
+                  <a key={i} href={url.trim()} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,100,255,.06)", borderColor: "rgba(0,100,255,.15)", color: "#0066cc" }}>
+                    📸 Galería de imágenes {selected.imagenesUrl.split(",").length > 1 ? `(${i + 1})` : ""}
                   </a>
-                )}
-                {selected.inscripcionUrl && (
-                  <a href={selected.inscripcionUrl} target="_blank" rel="noreferrer" className="te-inscripcion">
-                    🏁 Inscríbete en este evento
-                  </a>
-                )}
+                ))}
               </div>
             )}
             {!selected.description && !selected.reglamentoUrl && !selected.inscripcionUrl && !selected.resultadosUrl && !selected.imagenesUrl && (
