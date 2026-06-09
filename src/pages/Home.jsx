@@ -121,7 +121,7 @@ const CUOTAS = [
 const TARIFAS = {
   adulto: [
     { act: "4 actividades", trim: "90€", mes: "34€" },
-    { act: "3 actividades", trim: "80€", mes: "31€" },
+    { act: "3 actividades", trim: "80€", mes: "32€" },
     { act: "2 actividades", trim: "75€", mes: "30€" },
     { act: "1 actividad", trim: "66€", mes: "28€" },
     { act: "Externo no presencial", trim: "—", mes: "99€/año" },
