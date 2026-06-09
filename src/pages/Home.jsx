@@ -133,8 +133,8 @@ const TARIFAS = {
     { act: "1 actividad", trim: "66€", mes: "28€" },
   ],
   academy: [
-    { act: "2 actividades (bici + carrera)", trim: "71€", mes: "29€", anual: "200€" },
-    { act: "1 actividad", trim: "66€", mes: "28€", anual: "190€" },
+    { act: "2 actividades (bici + carrera)", trim: "75€", mes: "32€", anual: "210€" },
+    { act: "1 actividad", trim: "70€", mes: "30€", anual: "200€" },
   ],
 };
 
