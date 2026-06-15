@@ -179,7 +179,14 @@ export default function TransEventos() {
                 )}
               </div>
             )}
-            {(selected.reglamentoUrl || selected.inscripcionUrl || selected.resultadosUrl || selected.imagenesUrl) && (
+            {selected.inscripcionUrl && (
+              <div style={{ marginBottom: 32 }}>
+                <a href={selected.inscripcionUrl} target="_blank" rel="noreferrer" className="te-inscripcion">
+                  ✏️ ¡Inscríbete!
+                </a>
+              </div>
+            )}
+            {(selected.reglamentoUrl || selected.resultadosUrl || selected.imagenesUrl) && (
               <div className="te-detail-docs">
                 <h3>DOCUMENTOS Y ENLACES</h3>
                 {selected.reglamentoUrl && (
