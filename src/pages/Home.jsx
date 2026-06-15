@@ -189,7 +189,7 @@ export default function Home() {
   const [sy, setSy] = useState(0);
   const [tarifaTab, setTarifaTab] = useState("adulto");
   const [events, setEvents] = useState(EVENTS_DEFAULT);
-  const [popupEvent, setPopupEvent] = useState(null);
+  const [popupEvents, setPopupEvents] = useState([]);
 
   useEffect(() => {
     const loadBanner = async () => {
@@ -211,8 +211,9 @@ export default function Home() {
           const today = new Date().toISOString().slice(0, 10);
           if (localStorage.getItem("tt-popup-date") !== today) {
             const marked = mapped.filter(e => e.popup);
-            const chosen = marked.find(e => e.date >= today) || marked[0];
-            if (chosen) setPopupEvent(chosen);
+            const upcomingMarked = marked.filter(e => e.date >= today);
+            const chosen = (upcomingMarked.length ? upcomingMarked : marked).slice(0, 3);
+            if (chosen.length) setPopupEvents(chosen);
           }
         }
       } catch (e) { /* use defaults */ }
@@ -238,22 +239,34 @@ export default function Home() {
     return dateStr;
   };
 
-  const closePopup = () => { localStorage.setItem("tt-popup-date", new Date().toISOString().slice(0, 10)); setPopupEvent(null); };
+  const closePopup = () => { localStorage.setItem("tt-popup-date", new Date().toISOString().slice(0, 10)); setPopupEvents([]); };
 
   return (
     <div>
-      {popupEvent && (
+      {popupEvents.length > 0 && (
         <div onClick={closePopup} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--bg)", borderRadius: "var(--r)", maxWidth: 420, width: "100%", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,.5)", position: "relative" }}>
-            <button onClick={closePopup} aria-label="Cerrar" style={{ position: "absolute", top: 12, right: 12, zIndex: 2, width: 34, height: 34, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.45)", color: "#fff", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>×</button>
-            {popupEvent.img && <img src={popupEvent.img} alt="" style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }} />}
-            <div style={{ padding: "24px 26px 28px" }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--bg)", borderRadius: "var(--r)", maxWidth: 440, width: "100%", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,.5)", position: "relative" }}>
+            <button onClick={closePopup} aria-label="Cerrar" style={{ position: "absolute", top: 12, right: 12, zIndex: 3, width: 34, height: 34, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.45)", color: "#fff", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>×</button>
+            <div style={{ padding: "20px 26px 6px" }}>
               <div style={{ fontFamily: "var(--display)", color: "var(--red)", letterSpacing: 1, fontSize: 15 }}>🔔 NO TE LO PIERDAS</div>
-              <h3 style={{ fontFamily: "var(--display)", fontSize: 30, letterSpacing: .5, margin: "6px 0 8px", color: "var(--dark)" }}>{popupEvent.title}</h3>
-              <p style={{ color: "var(--text2)", fontSize: 14, marginBottom: 20 }}>{formatDate(popupEvent.date)} · {popupEvent.type}</p>
-              {popupEvent.inscripcionUrl
-                ? <a href={popupEvent.inscripcionUrl} target="_blank" rel="noopener noreferrer" onClick={closePopup} style={{ display: "block", textAlign: "center", background: "var(--red)", color: "#fff", padding: 14, borderRadius: "var(--rs)", textDecoration: "none", fontWeight: 700, letterSpacing: .3 }}>¡Inscríbete!</a>
-                : <div style={{ textAlign: "center", color: "var(--text2)", fontSize: 13 }}>Inscripciones próximamente</div>}
+              {popupEvents.length > 1 && <p style={{ color: "var(--text2)", fontSize: 13, marginTop: 4 }}>Próximos eventos destacados</p>}
+            </div>
+            <div style={{ padding: "8px 18px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
+              {popupEvents.map((ev, i) => {
+                const single = popupEvents.length === 1;
+                return (
+                  <div key={ev.title + i} style={{ borderRadius: "var(--r)", overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: "#fff" }}>
+                    {ev.img && <img src={ev.img} alt="" style={{ width: "100%", height: single ? 170 : 120, objectFit: "cover", display: "block" }} />}
+                    <div style={{ padding: single ? "18px 20px 20px" : "14px 16px 16px" }}>
+                      <h3 style={{ fontFamily: "var(--display)", fontSize: single ? 30 : 22, letterSpacing: .5, margin: "0 0 6px", color: "var(--dark)" }}>{ev.title}</h3>
+                      <p style={{ color: "var(--text2)", fontSize: 13, marginBottom: 14 }}>{formatDate(ev.date)} · {ev.type}</p>
+                      {ev.inscripcionUrl
+                        ? <a href={ev.inscripcionUrl} target="_blank" rel="noopener noreferrer" onClick={closePopup} style={{ display: "block", textAlign: "center", background: "var(--red)", color: "#fff", padding: 12, borderRadius: "var(--rs)", textDecoration: "none", fontWeight: 700, letterSpacing: .3 }}>¡Inscríbete!</a>
+                        : <div style={{ textAlign: "center", color: "var(--text2)", fontSize: 13 }}>Inscripciones próximamente</div>}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
