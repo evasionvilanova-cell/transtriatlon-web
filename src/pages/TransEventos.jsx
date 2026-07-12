@@ -196,12 +196,12 @@ export default function TransEventos() {
                 )}
                 {selected.resultadosUrl && (
                   <a href={selected.resultadosUrl} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,150,0,.06)", borderColor: "rgba(0,150,0,.15)", color: "#0a8a0a" }}>
-                    📊 Resultados{selected.resultadosUrl2 ? " (1)" : ""}
+                    📊 {selected.resultadosNombre || (selected.resultadosUrl2 ? "Resultados (1)" : "Resultados")}
                   </a>
                 )}
                 {selected.resultadosUrl2 && (
                   <a href={selected.resultadosUrl2} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,150,0,.06)", borderColor: "rgba(0,150,0,.15)", color: "#0a8a0a" }}>
-                    📊 Resultados (2)
+                    📊 {selected.resultadosNombre2 || "Resultados (2)"}
                   </a>
                 )}
                {selected.imagenesUrl && selected.imagenesUrl.split(",").map((url, i) => (
