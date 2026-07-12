@@ -1,460 +1,224 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { db, auth } from "../firebase.js";
-import { collection, query, orderBy, getDocs, doc, getDoc, setDoc, addDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase.js";
+import { collection, query, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import "../styles.css";
-
 const LOGO = "https://lh3.googleusercontent.com/d/1k4Vbce4KpniDHESGgsp-FJ-9k1WIX8Iy";
-
-export default function Dashboard() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [tab, setTab] = useState("trainings");
-  const [msg, setMsg] = useState("");
-
-  // Trainings state
-  const [trainings, setTrainings] = useState([]);
-  const [newWeek, setNewWeek] = useState("");
-  const [newTitle, setNewTitle] = useState("");
-  const [newCats, setNewCats] = useState("Natación,Ciclismo,Carrera,Funcional");
-  const [newPdfUrl, setNewPdfUrl] = useState("");
-  const [newTemporada, setNewTemporada] = useState("2025-2026");
-  const [uploading, setUploading] = useState(false);
-
-  // Athlete code state (2 codes)
-  const [athleteCode, setAthleteCode] = useState("");
-  const [newCode, setNewCode] = useState("");
-  const [athleteCode2, setAthleteCode2] = useState("");
-  const [newCode2, setNewCode2] = useState("");
-
-  // Banner state
-  const [banner, setBanner] = useState({ text: "", cta: "", ctaLink: "" });
-
-  // Events state
+const DEFAULT_IMG = "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop";
+export default function TransEventos() {
   const [events, setEvents] = useState([]);
-  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosUrl2: "", imagenesUrl: "", popup: false });
-  const [editingEvent, setEditingEvent] = useState(null);
-
-  // Ritmos state
-  const [ritmos, setRitmos] = useState([]);
-  const [newRitmo, setNewRitmo] = useState({ title: "", pdfUrl: "" });
-
-  // Licencias state
-  const [licencias, setLicencias] = useState([]);
-  const [newLicencia, setNewLicencia] = useState({ title: "", pdfUrl: "" });
-
-  // Inscripciones state
-  const [inscripciones, setInscripciones] = useState([]);
-
-  // Atletas state
-  const [atletas, setAtletas] = useState([]);
-  const [newAtleta, setNewAtleta] = useState({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" });
-  const [editingAtleta, setEditingAtleta] = useState(null);
-  const [showAddAtleta, setShowAddAtleta] = useState(false);
-
-  // Mensajes state
-  const [mensajes, setMensajes] = useState([]);
-
+  const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      setAuthenticated(!!user);
-    });
-    return () => unsub();
+    const load = async () => {
+      try {
+        const q = query(collection(db, "events"), orderBy("date", "asc"));
+        const snap = await getDocs(q);
+        setEvents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      } catch (e) { console.error(e); }
+      setLoading(false);
+    };
+    load();
   }, []);
-
-  const handleLogin = async () => {
-    setMsg("");
-    if (!email || !pass) { setMsg("Introduce email y contraseña"); return; }
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-      if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") setMsg("Contraseña incorrecta");
-      else if (e.code === "auth/user-not-found") setMsg("Usuario no encontrado");
-      else setMsg("Error: " + e.message);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    setAuthenticated(false);
-  };
-
-  useEffect(() => {
-    if (!authenticated) return;
-    loadTrainings(); loadAthleteCode(); loadBanner(); loadEvents();
-    loadRitmos(); loadLicencias(); loadInscripciones(); loadAtletas(); loadMensajes();
-  }, [authenticated]);
-
-  const loadTrainings = async () => {
-    try {
-      const q = query(collection(db, "trainings"), orderBy("weekStart", "desc"));
-      const snap = await getDocs(q);
-      setTrainings(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    } catch (e) { console.error(e); }
-  };
-
-  const loadAthleteCode = async () => {
-    try {
-      const snap = await getDoc(doc(db, "settings", "athleteCode"));
-      if (snap.exists()) {
-        setAthleteCode(snap.data().code);
-        setNewCode(snap.data().code);
-        setAthleteCode2(snap.data().code2 || "");
-        setNewCode2(snap.data().code2 || "");
-      }
-    } catch (e) { console.error(e); }
-  };
-
-  const loadBanner = async () => {
-    try {
-      const snap = await getDoc(doc(db, "settings", "banner"));
-      if (snap.exists()) setBanner(snap.data());
-    } catch (e) { console.error(e); }
-  };
-
-  const loadEvents = async () => {
-    try {
-      const q = query(collection(db, "events"), orderBy("date", "asc"));
-      const snap = await getDocs(q);
-      setEvents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    } catch (e) { console.error(e); }
-  };
-
-  const uploadTraining = async () => {
-    if (!newPdfUrl) { setMsg("Pega el enlace del PDF"); return; }
-    setUploading(true); setMsg("");
-    try {
-      await addDoc(collection(db, "trainings"), {
-        weekStart: newWeek || "", title: newTitle || `Entrenamiento ${newTemporada}`,
-        categories: newCats.split(",").map(c => c.trim()).filter(Boolean),
-        pdfUrl: newPdfUrl, temporada: newTemporada, createdAt: serverTimestamp(),
-      });
-      setNewWeek(""); setNewTitle(""); setNewPdfUrl("");
-      setMsg("✅ Entrenamiento subido correctamente!"); loadTrainings();
-    } catch (e) { setMsg("❌ Error: " + e.message); }
-    setUploading(false);
-  };
-
-  const deleteTraining = async (t) => {
-    if (!confirm(`¿Eliminar entrenamiento "${t.title}"?`)) return;
-    try { await deleteDoc(doc(db, "trainings", t.id)); setMsg("Entrenamiento eliminado"); loadTrainings(); } catch (e) { setMsg("Error: " + e.message); }
-  };
-
-  const saveAthleteCode = async () => {
-    try {
-      await setDoc(doc(db, "settings", "athleteCode"), { code: newCode, code2: newCode2 });
-      setAthleteCode(newCode); setAthleteCode2(newCode2);
-      setMsg("✅ Códigos de atletas actualizados!");
-    } catch (e) { setMsg("Error: " + e.message); }
-  };
-
-  const saveBanner = async () => {
-    try { await setDoc(doc(db, "settings", "banner"), banner); setMsg("✅ Banner actualizado!"); } catch (e) { setMsg("Error: " + e.message); }
-  };
-
-  const saveEvent = async () => {
-    if (!newEvent.title) { setMsg("El evento necesita un título"); return; }
-    try {
-      if (editingEvent) { await setDoc(doc(db, "events", editingEvent.id), newEvent); setEditingEvent(null); setMsg("✅ Evento actualizado!"); }
-      else { await addDoc(collection(db, "events"), newEvent); setMsg("✅ Evento añadido!"); }
-      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosUrl2: "", imagenesUrl: "", popup: false });
-      loadEvents();
-    } catch (e) { setMsg("Error: " + e.message); }
-  };
-
-  const startEditEvent = (ev) => {
-    setEditingEvent(ev);
-    setNewEvent({ title: ev.title || "", date: ev.date || "", type: ev.type || "Triatlón", imgUrl: ev.imgUrl || "", description: ev.description || "", reglamentoUrl: ev.reglamentoUrl || "", inscripcionUrl: ev.inscripcionUrl || "", resultadosUrl: ev.resultadosUrl || "", resultadosUrl2: ev.resultadosUrl2 || "", imagenesUrl: ev.imagenesUrl || "", popup: ev.popup || false });
-    setMsg("Editando: " + ev.title); window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const cancelEdit = () => { setEditingEvent(null); setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosUrl2: "", imagenesUrl: "", popup: false }); setMsg(""); };
-
-  const deleteEvent = async (ev) => {
-    if (!confirm(`¿Eliminar "${ev.title}"?`)) return;
-    try { await deleteDoc(doc(db, "events", ev.id)); setMsg("Evento eliminado"); loadEvents(); } catch (e) { setMsg("Error: " + e.message); }
-  };
-
-  const loadRitmos = async () => { try { const q = query(collection(db, "ritmos"), orderBy("createdAt", "desc")); const snap = await getDocs(q); setRitmos(snap.docs.map(d => ({ id: d.id, ...d.data() }))); } catch (e) { console.error(e); } };
-  const addRitmo = async () => { if (!newRitmo.title || !newRitmo.pdfUrl) { setMsg("Título y enlace del PDF son obligatorios"); return; } try { await addDoc(collection(db, "ritmos"), { ...newRitmo, createdAt: serverTimestamp() }); setNewRitmo({ title: "", pdfUrl: "" }); setMsg("✅ Ritmo añadido!"); loadRitmos(); } catch (e) { setMsg("Error: " + e.message); } };
-  const deleteRitmo = async (r) => { if (!confirm(`¿Eliminar "${r.title}"?`)) return; try { await deleteDoc(doc(db, "ritmos", r.id)); setMsg("Ritmo eliminado"); loadRitmos(); } catch (e) { setMsg("Error: " + e.message); } };
-
-  const loadLicencias = async () => { try { const q = query(collection(db, "licencias"), orderBy("createdAt", "desc")); const snap = await getDocs(q); setLicencias(snap.docs.map(d => ({ id: d.id, ...d.data() }))); } catch (e) { console.error(e); } };
-  const addLicencia = async () => { if (!newLicencia.title || !newLicencia.pdfUrl) { setMsg("Título y enlace del PDF son obligatorios"); return; } try { await addDoc(collection(db, "licencias"), { ...newLicencia, createdAt: serverTimestamp() }); setNewLicencia({ title: "", pdfUrl: "" }); setMsg("✅ Documento de licencia añadido!"); loadLicencias(); } catch (e) { setMsg("Error: " + e.message); } };
-  const deleteLicencia = async (l) => { if (!confirm(`¿Eliminar "${l.title}"?`)) return; try { await deleteDoc(doc(db, "licencias", l.id)); setMsg("Documento eliminado"); loadLicencias(); } catch (e) { setMsg("Error: " + e.message); } };
-
-  const loadInscripciones = async () => { try { const q = query(collection(db, "inscripciones"), orderBy("createdAt", "desc")); const snap = await getDocs(q); setInscripciones(snap.docs.map(d => ({ id: d.id, ...d.data() }))); } catch (e) { console.error(e); } };
-  const deleteInscripcion = async (ins) => { if (!confirm(`¿Eliminar inscripción de "${ins.nombre} ${ins.apellidos}"?`)) return; try { await deleteDoc(doc(db, "inscripciones", ins.id)); setMsg("Inscripción eliminada"); loadInscripciones(); } catch (e) { setMsg("Error: " + e.message); } };
-  const aprobarInscripcion = async (ins) => { try { await addDoc(collection(db, "atletas"), { nombre: ins.nombre, apellidos: ins.apellidos, fechaNacimiento: ins.fechaNacimiento, dni: ins.dni, direccion: ins.direccion, email: ins.email, movil: ins.movil, numeroCuenta: ins.numeroCuenta, formaPago: ins.formaPago, tipoCuota: ins.tipoCuota, redes: ins.redes || "", createdAt: serverTimestamp() }); await deleteDoc(doc(db, "inscripciones", ins.id)); setMsg("✅ Atleta añadido y inscripción procesada!"); loadInscripciones(); loadAtletas(); } catch (e) { setMsg("Error: " + e.message); } };
-  const exportInscripcionesCSV = () => { const headers = ["Nombre","Apellidos","Fecha Nac.","DNI","Dirección","Email","Móvil","Redes","Apto Físico","Tipo Cuota","Cuenta","Forma Pago"]; const rows = inscripciones.map(i => [i.nombre,i.apellidos,i.fechaNacimiento,i.dni,i.direccion,i.email,i.movil,i.redes,i.aptoFisico,i.tipoCuota,i.numeroCuenta,i.formaPago]); const csv = [headers, ...rows].map(r => r.map(c => `"${(c||"").replace(/"/g,'""')}"`).join(",")).join("\n"); const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "inscripciones_transtriatlon.csv"; a.click(); };
-
-  const loadAtletas = async () => { try { const q = query(collection(db, "atletas"), orderBy("apellidos", "asc")); const snap = await getDocs(q); setAtletas(snap.docs.map(d => ({ id: d.id, ...d.data() }))); } catch (e) { console.error(e); } };
-  const saveAtleta = async () => { if (!newAtleta.nombre || !newAtleta.apellidos) { setMsg("Nombre y apellidos son obligatorios"); return; } try { if (editingAtleta) { await setDoc(doc(db, "atletas", editingAtleta.id), { ...newAtleta, createdAt: editingAtleta.createdAt || serverTimestamp() }); setEditingAtleta(null); setShowAddAtleta(false); setMsg("✅ Atleta actualizado!"); } else { await addDoc(collection(db, "atletas"), { ...newAtleta, createdAt: serverTimestamp() }); setMsg("✅ Atleta añadido!"); } setNewAtleta({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" }); loadAtletas(); } catch (e) { setMsg("Error: " + e.message); } };
-  const startEditAtleta = (a) => { setEditingAtleta(a); setNewAtleta({ nombre: a.nombre || "", apellidos: a.apellidos || "", fechaNacimiento: a.fechaNacimiento || "", dni: a.dni || "", direccion: a.direccion || "", email: a.email || "", movil: a.movil || "", numeroCuenta: a.numeroCuenta || "", formaPago: a.formaPago || "Mensual", tipoCuota: a.tipoCuota || "" }); setShowAddAtleta(true); setMsg("Editando: " + a.nombre + " " + a.apellidos); };
-  const cancelEditAtleta = () => { setEditingAtleta(null); setNewAtleta({ nombre: "", apellidos: "", fechaNacimiento: "", dni: "", direccion: "", email: "", movil: "", numeroCuenta: "", formaPago: "Mensual", tipoCuota: "" }); setShowAddAtleta(false); setMsg(""); };
-  const deleteAtleta = async (a) => { if (!confirm(`¿Eliminar atleta "${a.nombre} ${a.apellidos}"?`)) return; try { await deleteDoc(doc(db, "atletas", a.id)); setMsg("Atleta eliminado"); loadAtletas(); } catch (e) { setMsg("Error: " + e.message); } };
-  const exportAtletasCSV = () => { const headers = ["Nombre","Apellidos","Fecha Nac.","DNI","Dirección","Email","Móvil","Cuenta","Forma Pago","Tipo Cuota"]; const rows = atletas.map(a => [a.nombre,a.apellidos,a.fechaNacimiento,a.dni,a.direccion,a.email,a.movil,a.numeroCuenta,a.formaPago,a.tipoCuota]); const csv = [headers, ...rows].map(r => r.map(c => `"${(c||"").replace(/"/g,'""')}"`).join(",")).join("\n"); const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }); const url = URL.createObjectURL(blob); const a2 = document.createElement("a"); a2.href = url; a2.download = "atletas_transtriatlon.csv"; a2.click(); };
-
-  const loadMensajes = async () => { try { const q = query(collection(db, "mensajes"), orderBy("createdAt", "desc")); const snap = await getDocs(q); setMensajes(snap.docs.map(d => ({ id: d.id, ...d.data() }))); } catch (e) { console.error(e); } };
-  const deleteMensaje = async (m) => { if (!confirm("¿Eliminar este mensaje?")) return; try { await deleteDoc(doc(db, "mensajes", m.id)); setMsg("Mensaje eliminado"); loadMensajes(); } catch (e) { setMsg("Error: " + e.message); } };
-
-  if (!authenticated) {
-    return (
-      <div style={{ minHeight: "100vh", background: "var(--dark)", color: "var(--white)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <style>{`
-          .dash-login{max-width:380px;width:100%;text-align:center}
-          .dash-login img{height:56px;margin:0 auto 20px;filter:brightness(0) invert(1)}
-          .dash-login h1{font-family:var(--display);font-size:36px;letter-spacing:2px;margin-bottom:6px}
-          .dash-login p{color:rgba(255,255,255,.35);font-size:13px;margin-bottom:28px}
-          .dash-input{width:100%;padding:14px 18px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-size:15px;font-family:var(--font);outline:none}
-          .dash-input:focus{border-color:var(--red)}
-          .dash-btn{width:100%;padding:14px;border-radius:10px;background:var(--red);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;margin-top:12px;font-family:var(--font)}
-          .dash-msg{font-size:12px;margin-top:10px;color:var(--red-l)}
-        `}</style>
-        <div className="dash-login">
-          <img src={LOGO} alt="T" />
-          <h1>DASHBOARD</h1>
-          <p>Panel de administración para entrenadores</p>
-          <input className="dash-input" type="email" placeholder="Email" value={email}
-            onChange={(e) => setEmail(e.target.value)} style={{ marginBottom: 10 }} />
-          <input className="dash-input" type="password" placeholder="Contraseña" value={pass}
-            onChange={(e) => setPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleLogin()} />
-          <button className="dash-btn" onClick={handleLogin}>Entrar</button>
-          {msg && <div className="dash-msg">{msg}</div>}
-          <Link to="/" style={{ color: "rgba(255,255,255,.3)", fontSize: 13, marginTop: 20, display: "block" }}>← Volver a la web</Link>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ minHeight: "100vh", background: "#111", color: "var(--white)" }}>
-      <style>{`
-        .d-hdr{background:rgba(11,10,9,.95);border-bottom:1px solid rgba(255,255,255,.06);padding:16px clamp(16px,3vw,32px);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-        .d-hdr-left{display:flex;align-items:center;gap:10px}
-        .d-hdr-left img{height:28px;filter:brightness(0) invert(1)}
-        .d-hdr-left span{font-family:var(--display);font-size:18px;letter-spacing:2px}
-        .d-badge{padding:4px 12px;border-radius:100px;background:rgba(232,30,30,.15);color:var(--red-l);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-left:10px}
-        .d-layout{display:flex;min-height:calc(100vh - 61px)}
-        .d-side{width:220px;background:rgba(0,0,0,.3);border-right:1px solid rgba(255,255,255,.06);padding:24px 0;flex-shrink:0}
-        .d-side-item{padding:12px 24px;font-size:13px;font-weight:500;color:rgba(255,255,255,.4);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;border-left:3px solid transparent}
-        .d-side-item:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.03)}
-        .d-side-item.ac{color:#fff;border-left-color:var(--red);background:rgba(232,30,30,.06)}
-        .d-main{flex:1;padding:32px clamp(16px,3vw,40px);max-width:900px}
-        .d-title{font-family:var(--display);font-size:32px;letter-spacing:2px;margin-bottom:8px}
-        .d-subtitle{font-size:13px;color:rgba(255,255,255,.35);margin-bottom:32px}
-        .d-msg{padding:12px 16px;border-radius:8px;background:rgba(255,255,255,.05);font-size:13px;margin-bottom:24px;border:1px solid rgba(255,255,255,.08)}
-        .d-card{padding:24px;border-radius:var(--r);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin-bottom:16px}
-        .d-card h3{font-family:var(--display);font-size:20px;letter-spacing:1px;margin-bottom:16px}
-        .d-field{margin-bottom:16px}
-        .d-field label{display:block;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
-        .d-field select option{background:#1a1a1a;color:#fff}
-        .d-field input,.d-field textarea,.d-field select{width:100%;padding:12px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-size:14px;font-family:var(--font);outline:none}
-        .d-field input:focus,.d-field textarea:focus{border-color:var(--red)}
-        .d-field textarea{min-height:80px;resize:vertical}
-        .d-row{display:flex;gap:12px;flex-wrap:wrap}
-        .d-row .d-field{flex:1;min-width:200px}
-        .d-btn{padding:12px 24px;border-radius:10px;background:var(--red);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);transition:all .2s}
-        .d-btn:hover{background:var(--red-l)}
-        .d-btn:disabled{opacity:.5;cursor:not-allowed}
-        .d-btn-sm{padding:8px 16px;font-size:12px;border-radius:8px}
-        .d-btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
-        .d-btn-ghost:hover{border-color:var(--red);color:var(--red-l);background:rgba(232,30,30,.06)}
-        .d-btn-danger{background:transparent;border:1px solid rgba(255,100,100,.2);color:rgba(255,100,100,.6)}
-        .d-btn-danger:hover{background:rgba(255,50,50,.1);color:#ff6666}
-        .d-list-item{display:flex;align-items:center;justify-content:space-between;padding:16px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);margin-bottom:10px;gap:12px;flex-wrap:wrap}
-        .d-list-item:hover{background:rgba(255,255,255,.04)}
-        .d-list-info{flex:1;min-width:200px}
-        .d-list-info h4{font-size:14px;font-weight:600}
-        .d-list-info p{font-size:12px;color:rgba(255,255,255,.35);margin-top:2px}
-        .d-code-display{font-family:monospace;font-size:32px;letter-spacing:8px;color:var(--red);padding:20px;background:rgba(232,30,30,.06);border-radius:12px;text-align:center;border:1px dashed rgba(232,30,30,.2);margin-bottom:20px}
-        @media(max-width:768px){
-          .d-side{display:none}.d-layout{flex-direction:column}
-          .d-mob-tabs{display:flex;gap:4px;padding:12px 16px;overflow-x:auto;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.06)}
-          .d-mob-tab{padding:8px 16px;border-radius:100px;font-size:12px;font-weight:600;white-space:nowrap;background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);border:none;cursor:pointer;font-family:var(--font)}
-          .d-mob-tab.ac{background:var(--red);color:#fff}
+  const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return new Date(dateStr + "T00:00:00");
+    const months = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setembre:8,octubre:9,noviembre:10,diciembre:11 };
+    const parts = dateStr.toLowerCase().replace(/de /g, "").trim().split(/\s+/);
+    for (const [name, idx] of Object.entries(months)) {
+      for (const p of parts) {
+        if (p.startsWith(name.substring(0, 3))) {
+          const year = parts.find(x => /^\d{4}$/.test(x));
+          return new Date(year ? parseInt(year) : new Date().getFullYear(), idx, parts.find(x => /^\d{1,2}$/.test(x)) || 1);
         }
-        @media(min-width:769px){.d-mob-tabs{display:none}}
+      }
+    }
+    return null;
+  };
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      const d = new Date(dateStr + "T00:00:00");
+      return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+    }
+    return dateStr;
+  };
+  const now = new Date();
+  now.setHours(0,0,0,0);
+  const upcoming = events.filter(e => { const d = parseDate(e.date); return !d || d >= now; });
+  const past = events.filter(e => { const d = parseDate(e.date); return d && d < now; }).reverse();
+  return (
+    <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
+      <style>{`
+        .te-hdr{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);padding:16px clamp(16px,4vw,48px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,.06)}
+        .te-hdr-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+        .te-hdr-logo img{height:32px}
+        .te-hdr-logo span{font-family:var(--display);font-size:18px;letter-spacing:2px;color:var(--text)}
+        .te-back{padding:8px 18px;border-radius:100px;border:1px solid rgba(0,0,0,.1);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .2s;text-decoration:none}
+        .te-back:hover{border-color:var(--red);color:var(--red)}
+        .te-hero{padding:clamp(48px,8vw,80px) clamp(16px,4vw,48px) 32px;text-align:center}
+        .te-hero-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+        .te-hero h1{font-family:var(--display);font-size:clamp(42px,7vw,80px);letter-spacing:2px;line-height:1}
+        .te-hero p{font-size:16px;color:var(--text2);margin-top:12px;max-width:500px;margin-inline:auto}
+        .te-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding:0 clamp(16px,4vw,48px) 80px;max-width:1200px;margin:0 auto}
+        .te-card{border-radius:var(--r);overflow:hidden;background:#fff;border:1px solid rgba(0,0,0,.06);transition:all .35s;cursor:pointer}
+        .te-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.08);border-color:rgba(232,30,30,.15)}
+        .te-card-img{aspect-ratio:4/3;overflow:hidden;position:relative}
+        .te-card-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+        .te-card:hover .te-card-img img{transform:scale(1.05)}
+        .te-card-type{position:absolute;top:12px;left:12px;padding:4px 12px;border-radius:100px;background:var(--red);color:#fff;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+        .te-card-body{padding:20px}
+        .te-card-body h3{font-family:var(--display);font-size:24px;letter-spacing:1.5px}
+        .te-card-body .date{font-size:13px;color:var(--text2);margin-top:4px}
+        .te-detail{max-width:800px;margin:0 auto;padding:0 clamp(16px,4vw,48px) 80px}
+        .te-detail-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:24px;transition:color .2s}
+        .te-detail-back:hover{color:var(--red)}
+        .te-detail-img{width:100%;max-width:500px;border-radius:var(--r);overflow:hidden;margin-bottom:32px}
+        .te-detail-img img{width:100%;height:auto;display:block}
+        .te-detail h1{font-family:var(--display);font-size:clamp(36px,5vw,56px);letter-spacing:2px;line-height:1;margin-bottom:8px}
+        .te-detail-meta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+        .te-detail-tag{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:600;letter-spacing:1px}
+        .te-detail-tag.type{background:rgba(232,30,30,.08);color:var(--red)}
+        .te-detail-tag.date{background:rgba(0,0,0,.04);color:var(--text2)}
+        .te-detail-desc{font-size:16px;line-height:1.8;color:var(--text2);margin-bottom:32px;white-space:pre-wrap}
+        .te-detail-docs{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+        .te-detail-docs h3{font-family:var(--display);font-size:22px;letter-spacing:1.5px;margin-bottom:8px;color:var(--text)}
+        .te-doc-link{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:12px;background:rgba(232,30,30,.06);border:1px solid rgba(232,30,30,.1);color:var(--red);font-size:14px;font-weight:600;text-decoration:none;transition:all .25s}
+        .te-doc-link:hover{background:var(--red);color:#fff;border-color:var(--red)}
+        .te-inscripcion{display:inline-flex;align-items:center;gap:8px;padding:16px 32px;border-radius:100px;background:var(--red);color:#fff;font-size:15px;font-weight:700;text-decoration:none;transition:all .25s;letter-spacing:.5px}
+        .te-inscripcion:hover{background:var(--red-l);transform:translateY(-2px);box-shadow:0 8px 24px var(--red-glow)}
+        .te-loading{text-align:center;padding:80px;color:var(--text2)}
+        .te-empty{text-align:center;padding:80px;color:var(--text2);font-size:15px}
       `}</style>
-
-      <div className="d-hdr">
-        <div className="d-hdr-left"><img src={LOGO} alt="T" /><span>TRANSTRIATLON</span><span className="d-badge">Dashboard</span></div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <Link to="/" style={{ color: "rgba(255,255,255,.4)", fontSize: 12 }}>Ver web</Link>
-          <button className="d-btn d-btn-sm d-btn-ghost" onClick={handleLogout}>Cerrar sesión</button>
-        </div>
+      <div className="te-hdr">
+        <Link to="/" className="te-hdr-logo">
+          <img src={LOGO} alt="T" />
+          <span>TRANSTRIATLON</span>
+        </Link>
+        <Link to="/" className="te-back">← Volver</Link>
       </div>
-
-      <div className="d-mob-tabs">
-        {[["trainings","🏋️ Entrenos"],["inscripciones","📝 Inscripciones"],["atletas","👥 Atletas"],["mensajes","💬 Mensajes"],["code","🔑 Código"],["banner","📢 Banner"],["events","🏆 Eventos"],["ritmos","⏱️ Ritmos"],["licencias","📋 Licencias"]].map(([id,label]) => (
-          <button key={id} className={`d-mob-tab ${tab===id?"ac":""}`} onClick={()=>setTab(id)}>{label}</button>
-        ))}
-      </div>
-
-      <div className="d-layout">
-        <div className="d-side">
-          {[{id:"trainings",icon:"🏋️",label:"Entrenamientos"},{id:"inscripciones",icon:"📝",label:"Inscripciones"},{id:"atletas",icon:"👥",label:"Atletas"},{id:"mensajes",icon:"💬",label:"Mensajes"},{id:"code",icon:"🔑",label:"Código Atletas"},{id:"banner",icon:"📢",label:"Banner"},{id:"events",icon:"🏆",label:"Eventos"},{id:"ritmos",icon:"⏱️",label:"Ritmos"},{id:"licencias",icon:"📋",label:"Licencias"}].map(s => (
-            <div key={s.id} className={`d-side-item ${tab === s.id ? "ac" : ""}`} onClick={() => setTab(s.id)}>
-              <span>{s.icon}</span> {s.label}
+      {!selected ? (
+        <>
+          <div className="te-hero">
+            <div className="te-hero-label">TransEventos</div>
+            <h1>COMPETICIONES Y EVENTOS</h1>
+            <p>Descubre todas las competiciones organizadas por Transtriatlon en Vilanova i la Geltrú.</p>
+          </div>
+          {loading ? (
+            <div className="te-loading">Cargando eventos...</div>
+          ) : events.length === 0 ? (
+            <div className="te-empty">No hay eventos disponibles.</div>
+          ) : (
+            <>
+              {upcoming.length > 0 && (
+                <>
+                  <h2 style={{ fontFamily: "var(--display)", fontSize: 28, letterSpacing: 2, padding: "0 clamp(16px,4vw,48px)", maxWidth: 1200, margin: "0 auto 20px" }}>
+                    PRÓXIMOS EVENTOS
+                  </h2>
+                  <div className="te-grid">
+                    {upcoming.map(ev => (
+                      <div key={ev.id} className="te-card" onClick={() => setSelected(ev)}>
+                        <div className="te-card-img">
+                          <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
+                          <div className="te-card-type">{ev.type}</div>
+                        </div>
+                        <div className="te-card-body">
+                          <h3>{ev.title}</h3>
+                          <div className="date">{formatDate(ev.date)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              {past.length > 0 && (
+                <>
+                  <h2 style={{ fontFamily: "var(--display)", fontSize: 28, letterSpacing: 2, padding: "48px clamp(16px,4vw,48px) 20px", maxWidth: 1200, margin: "0 auto", color: "var(--text2)" }}>
+                    EVENTOS PASADOS
+                  </h2>
+                  <div className="te-grid" style={{ opacity: 0.7 }}>
+                    {past.map(ev => (
+                      <div key={ev.id} className="te-card" onClick={() => setSelected(ev)}>
+                        <div className="te-card-img">
+                          <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
+                          <div className="te-card-type" style={{ background: "#666" }}>{ev.type}</div>
+                          {ev.resultadosUrl && <div style={{ position: "absolute", bottom: 12, right: 12, padding: "4px 12px", borderRadius: 100, background: "#fff", color: "var(--text)", fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>📊 RESULTADOS</div>}
+                        </div>
+                        <div className="te-card-body">
+                          <h3>{ev.title}</h3>
+                          <div className="date">{formatDate(ev.date)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </>
+      ) : (
+        <div style={{ paddingTop: 40 }}>
+          <div className="te-detail">
+            <div className="te-detail-back" onClick={() => setSelected(null)}>← Volver a todos los eventos</div>
+            {selected.imgUrl && (
+              <div className="te-detail-img">
+                <img src={selected.imgUrl} alt={selected.title} />
+              </div>
+            )}
+            <h1>{selected.title}</h1>
+            <div className="te-detail-meta">
+              <span className="te-detail-tag type">{selected.type}</span>
+              <span className="te-detail-tag date">{formatDate(selected.date)}</span>
             </div>
-          ))}
-        </div>
-
-        <div className="d-main">
-          {msg && <div className="d-msg">{msg}</div>}
-
-          {/* ── TRAININGS TAB ── */}
-          {tab === "trainings" && (<>
-            <div className="d-title">ENTRENAMIENTOS</div>
-            <div className="d-subtitle">Sube los entrenamientos semanales en PDF para tus atletas</div>
-            <div className="d-card">
-              <h3>SUBIR NUEVO ENTRENAMIENTO</h3>
-              <div className="d-row">
-                <div className="d-field"><label>Temporada</label><select value={newTemporada} onChange={(e) => setNewTemporada(e.target.value)}><option>2025-2026</option><option>2024-2025</option><option>2023-2024</option><option>2022-2023</option><option>2021-2022</option><option>2020-2021</option><option>2019-2020</option><option>2018-2019</option><option>2017-2018</option></select></div>
-                <div className="d-field"><label>Semana (opcional)</label><input type="date" value={newWeek} onChange={(e) => setNewWeek(e.target.value)} /></div>
+            {selected.description && (
+              <div className="te-detail-desc">
+                {selected.description.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                  /^https?:\/\//.test(part) ? (
+                    <a key={i} href={part} target="_blank" rel="noreferrer" style={{ color: "var(--red)", wordBreak: "break-all" }}>{part}</a>
+                  ) : part
+                )}
               </div>
-              <div className="d-row">
-                <div className="d-field"><label>Título</label><input type="text" placeholder="Ej: Entrenamientos 2025, Semana de carga..." value={newTitle} onChange={(e) => setNewTitle(e.target.value)} /></div>
-                <div className="d-field"><label>Categorías (separadas por coma)</label><input type="text" value={newCats} onChange={(e) => setNewCats(e.target.value)} /></div>
+            )}
+            {selected.inscripcionUrl && (
+              <div style={{ marginBottom: 32 }}>
+                <a href={selected.inscripcionUrl} target="_blank" rel="noreferrer" className="te-inscripcion">
+                  ✏️ ¡Inscríbete!
+                </a>
               </div>
-              <div className="d-field"><label>Enlace del PDF (Google Drive, Dropbox, etc.)</label><input type="url" placeholder="https://drive.google.com/file/d/..." value={newPdfUrl} onChange={(e) => setNewPdfUrl(e.target.value)} /></div>
-              <button className="d-btn" onClick={uploadTraining} disabled={uploading}>{uploading ? "Subiendo..." : "📤 Subir Entrenamiento"}</button>
-            </div>
-            <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>ENTRENAMIENTOS SUBIDOS ({trainings.length})</h3>
-            {trainings.map(t => (<div key={t.id} className="d-list-item"><div className="d-list-info"><h4>{t.title}</h4><p>{t.temporada ? `📅 ${t.temporada} · ` : ""}{t.weekStart ? `Semana del ${t.weekStart} · ` : ""}{(t.categories || []).join(", ")}</p></div><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteTraining(t)}>Eliminar</button></div>))}
-          </>)}
-
-          {/* ── CODE TAB (2 CODES) ── */}
-          {tab === "code" && (<>
-            <div className="d-title">CÓDIGOS DE ACCESO ATLETAS</div>
-            <div className="d-subtitle">Crea o cambia los códigos que los atletas usan para acceder a sus entrenamientos. Puedes tener hasta 2 códigos activos.</div>
-            <div className="d-card">
-              <h3>CÓDIGOS ACTUALES</h3>
-              {athleteCode ? (<div className="d-code-display">{athleteCode}</div>) : (<p style={{ color: "rgba(255,255,255,.35)", marginBottom: 16 }}>No hay código 1 configurado.</p>)}
-              {athleteCode2 ? (<div className="d-code-display" style={{ marginTop: 10 }}>{athleteCode2}</div>) : (<p style={{ color: "rgba(255,255,255,.35)", marginBottom: 16 }}>No hay código 2 configurado.</p>)}
-              <div className="d-field">
-                <label>Código 1</label>
-                <input type="text" value={newCode} onChange={(e) => setNewCode(e.target.value.toUpperCase())} placeholder="Ej: TRANS2026" maxLength={12} style={{ letterSpacing: 4, fontSize: 18 }} />
+            )}
+            {(selected.reglamentoUrl || selected.resultadosUrl || selected.resultadosUrl2 || selected.imagenesUrl) && (
+              <div className="te-detail-docs">
+                <h3>DOCUMENTOS Y ENLACES</h3>
+                {selected.reglamentoUrl && (
+                  <a href={selected.reglamentoUrl} target="_blank" rel="noreferrer" className="te-doc-link">
+                    📄 Reglamento del evento
+                  </a>
+                )}
+                {selected.resultadosUrl && (
+                  <a href={selected.resultadosUrl} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,150,0,.06)", borderColor: "rgba(0,150,0,.15)", color: "#0a8a0a" }}>
+                    📊 Resultados{selected.resultadosUrl2 ? " (1)" : ""}
+                  </a>
+                )}
+                {selected.resultadosUrl2 && (
+                  <a href={selected.resultadosUrl2} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,150,0,.06)", borderColor: "rgba(0,150,0,.15)", color: "#0a8a0a" }}>
+                    📊 Resultados (2)
+                  </a>
+                )}
+               {selected.imagenesUrl && selected.imagenesUrl.split(",").map((url, i) => (
+                  <a key={i} href={url.trim()} target="_blank" rel="noreferrer" className="te-doc-link" style={{ background: "rgba(0,100,255,.06)", borderColor: "rgba(0,100,255,.15)", color: "#0066cc" }}>
+                    📸 Galería de imágenes {selected.imagenesUrl.split(",").length > 1 ? `(${i + 1})` : ""}
+                  </a>
+                ))}
               </div>
-              <div className="d-field">
-                <label>Código 2 (opcional)</label>
-                <input type="text" value={newCode2} onChange={(e) => setNewCode2(e.target.value.toUpperCase())} placeholder="Ej: TRANS2026B" maxLength={12} style={{ letterSpacing: 4, fontSize: 18 }} />
-              </div>
-              <button className="d-btn" onClick={saveAthleteCode}>💾 Guardar Códigos</button>
-            </div>
-            <div className="d-card" style={{ marginTop: 16 }}>
-              <h3>CÓMO FUNCIONA</h3>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,.4)", lineHeight: 1.7 }}>
-                1. Crea uno o dos códigos aquí (ej: TRANS2026 y TRANS2026B)<br />
-                2. Compártelos con tus atletas registrados<br />
-                3. Los atletas van a la página "Acceso Atletas" e introducen cualquiera de los dos códigos<br />
-                4. Una vez autenticados, ven todos los entrenamientos que hayas subido<br />
-                5. Puedes cambiar los códigos cuando quieras — los atletas necesitarán los nuevos
+            )}
+            {!selected.description && !selected.reglamentoUrl && !selected.inscripcionUrl && !selected.resultadosUrl && !selected.resultadosUrl2 && !selected.imagenesUrl && (
+              <p style={{ color: "var(--text2)", fontSize: 15, marginTop: 16 }}>
+                Próximamente más información sobre este evento. Contacta con nosotros para más detalles.
               </p>
-            </div>
-          </>)}
-
-          {/* ── BANNER TAB ── */}
-          {tab === "banner" && (<>
-            <div className="d-title">BANNER DE LA HOME</div>
-            <div className="d-subtitle">Edita el banner rojo que aparece debajo del menú en la página principal</div>
-            <div className="d-card">
-              <h3>EDITAR BANNER</h3>
-              <div className="d-field"><label>Texto del banner</label><input type="text" value={banner.text} onChange={(e) => setBanner({ ...banner, text: e.target.value })} placeholder="📣 Inscripciones abiertas..." /></div>
-              <div className="d-row">
-                <div className="d-field"><label>Texto del botón</label><input type="text" value={banner.cta} onChange={(e) => setBanner({ ...banner, cta: e.target.value })} placeholder="Inscríbete" /></div>
-                <div className="d-field"><label>Enlace del botón</label><input type="url" value={banner.ctaLink} onChange={(e) => setBanner({ ...banner, ctaLink: e.target.value })} placeholder="https://..." /></div>
-              </div>
-              <button className="d-btn" onClick={saveBanner}>💾 Guardar Banner</button>
-            </div>
-            <div className="d-card" style={{ marginTop: 16 }}><h3>PREVISUALIZACIÓN</h3><div style={{ background: "var(--red)", padding: "14px 20px", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}><span style={{ color: "#fff", fontSize: 14, fontWeight: 500 }}>{banner.text || "Texto del banner..."}</span><span style={{ padding: "6px 16px", borderRadius: 100, background: "#fff", color: "var(--red)", fontSize: 12, fontWeight: 700 }}>{banner.cta || "BOTÓN"}</span></div></div>
-          </>)}
-
-          {/* ── EVENTS TAB ── */}
-          {tab === "events" && (<>
-            <div className="d-title">TRANSEVENTOS</div>
-            <div className="d-subtitle">Gestiona los eventos y competiciones que aparecen en la web</div>
-            <div className="d-card" style={{ borderColor: editingEvent ? "var(--red)" : undefined }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}><h3>{editingEvent ? "✏️ EDITANDO EVENTO" : "AÑADIR EVENTO"}</h3>{editingEvent && <button className="d-btn d-btn-sm d-btn-ghost" onClick={cancelEdit}>Cancelar edición</button>}</div>
-              <div className="d-row"><div className="d-field"><label>Nombre del evento</label><input type="text" value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} placeholder="Ej: Travessia d'Hivern" /></div><div className="d-field"><label>Fecha del evento</label><input type="date" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} /></div></div>
-              <div className="d-field"><label>Tipo</label><select value={newEvent.type} onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}><option>Running</option><option>Triatlón</option><option>Duatlón</option><option>Acuatlón</option><option>Natación</option><option>Aquabike</option><option>Swimrun</option></select></div>
-              <div className="d-field">
-                <label>URL de la imagen del cartel</label>
-                <input type="url" value={newEvent.imgUrl} onChange={(e) => { let url = e.target.value; const gdMatch = url.match(/\/file\/d\/([^/]+)/); if (gdMatch) url = `https://lh3.googleusercontent.com/d/${gdMatch[1]}`; if (url.includes("1drv.ms") || url.includes("onedrive.live.com")) { url = url.replace(/&e=.*$/, "").replace(/\?e=.*$/, "") + "?download=1"; } setNewEvent({ ...newEvent, imgUrl: url }); }} placeholder="Pega enlace de Google Drive, OneDrive o URL de imagen..." />
-                <p style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 6, lineHeight: 1.5 }}>Sube la imagen a Google Drive, OneDrive o cualquier servicio → Compartir → "Cualquier persona con el enlace" → Pega aquí. Se convierte automáticamente.</p>
-                {newEvent.imgUrl && (<div style={{ marginTop: 12, borderRadius: 10, overflow: "hidden", maxWidth: 200, border: "1px solid rgba(255,255,255,.1)" }}><img src={newEvent.imgUrl} alt="Preview" style={{ width: "100%", height: "auto", display: "block" }} onError={(e) => { e.target.style.display = "none"; }} /></div>)}
-              </div>
-              <div className="d-field"><label>Descripción del evento</label><textarea value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} placeholder="Recorrido, categorías, horarios, info relevante..." style={{ minHeight: 100 }} /></div>
-              <div className="d-row"><div className="d-field"><label>Enlace reglamento (PDF / Google Drive)</label><input type="url" value={newEvent.reglamentoUrl} onChange={(e) => setNewEvent({ ...newEvent, reglamentoUrl: e.target.value })} placeholder="https://drive.google.com/..." /></div><div className="d-field"><label>Enlace inscripción al evento</label><input type="url" value={newEvent.inscripcionUrl} onChange={(e) => setNewEvent({ ...newEvent, inscripcionUrl: e.target.value })} placeholder="https://..." /></div></div>
-              <div className="d-row"><div className="d-field"><label>Enlace resultados 1 (URL o PDF Google Drive)</label><input type="url" value={newEvent.resultadosUrl} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl: e.target.value })} placeholder="https://..." /></div><div className="d-field"><label>Enlace resultados 2 (opcional)</label><input type="url" value={newEvent.resultadosUrl2} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl2: e.target.value })} placeholder="https://... (segundo PDF si lo hay)" /></div></div>
-              <div className="d-field"><label>Enlace galería de imágenes del evento</label><input type="url" value={newEvent.imagenesUrl} onChange={(e) => setNewEvent({ ...newEvent, imagenesUrl: e.target.value })} placeholder="https://photos.google.com/... o enlace al álbum" /></div>
-              <div className="d-field" style={{ flexDirection: "row", alignItems: "center", gap: 10 }}><input type="checkbox" id="popupChk" checked={newEvent.popup} onChange={(e) => setNewEvent({ ...newEvent, popup: e.target.checked })} style={{ width: 18, height: 18, accentColor: "var(--red)", flex: "0 0 auto" }} /><label htmlFor="popupChk" style={{ margin: 0, cursor: "pointer" }}>🔔 Mostrar como pop-up al abrir la web (recordatorio con botón de inscripción)</label></div>
-            <button className="d-btn" onClick={saveEvent}>{editingEvent ? "💾 Guardar Cambios" : "➕ Añadir Evento"}</button>
-            </div>
-            <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>EVENTOS ({events.length})</h3>
-            {events.map(ev => (<div key={ev.id} className="d-list-item"><div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 200 }}>{ev.imgUrl && <img src={ev.imgUrl} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover" }} />}<div className="d-list-info"><h4>{ev.title}</h4><p>{ev.date} · {ev.type}{ev.popup ? " · 🔔 Pop-up" : ""}{ev.resultadosUrl ? ` · 📊 Resultados${ev.resultadosUrl2 ? " (2)" : ""}` : ""}{ev.imagenesUrl ? " · 📸 Imágenes" : ""}</p></div></div><div style={{ display: "flex", gap: 8 }}><button className="d-btn d-btn-sm d-btn-ghost" onClick={() => startEditEvent(ev)}>✏️ Editar</button><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteEvent(ev)}>Eliminar</button></div></div>))}
-          </>)}
-
-          {/* ── RITMOS TAB ── */}
-          {tab === "ritmos" && (<>
-            <div className="d-title">RITMOS</div><div className="d-subtitle">Sube tablas de ritmos y zonas de entreno en PDF para tus atletas</div>
-            <div className="d-card"><h3>AÑADIR DOCUMENTO DE RITMOS</h3><div className="d-row"><div className="d-field"><label>Título</label><input type="text" placeholder="Ej: Tabla de ritmos natación T1" value={newRitmo.title} onChange={(e) => setNewRitmo({ ...newRitmo, title: e.target.value })} /></div><div className="d-field"><label>Enlace del PDF</label><input type="url" placeholder="https://drive.google.com/file/d/..." value={newRitmo.pdfUrl} onChange={(e) => setNewRitmo({ ...newRitmo, pdfUrl: e.target.value })} /></div></div><button className="d-btn" onClick={addRitmo}>📤 Añadir Ritmo</button></div>
-            <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>DOCUMENTOS DE RITMOS ({ritmos.length})</h3>
-            {ritmos.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay documentos de ritmos todavía.</p>}
-            {ritmos.map(r => (<div key={r.id} className="d-list-item"><div className="d-list-info"><h4>⏱️ {r.title}</h4><p style={{ fontSize: 11, wordBreak: "break-all" }}>{r.pdfUrl}</p></div><div style={{ display: "flex", gap: 8 }}><a href={r.pdfUrl} target="_blank" rel="noreferrer" className="d-btn d-btn-sm d-btn-ghost" style={{ textDecoration: "none" }}>Ver PDF</a><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteRitmo(r)}>Eliminar</button></div></div>))}
-          </>)}
-
-          {/* ── LICENCIAS TAB ── */}
-          {tab === "licencias" && (<>
-            <div className="d-title">TRAMITACIÓN LICENCIAS</div><div className="d-subtitle">Sube documentos PDF sobre tramitación de licencias federativas para tus atletas</div>
-            <div className="d-card"><h3>AÑADIR DOCUMENTO DE LICENCIA</h3><div className="d-row"><div className="d-field"><label>Título</label><input type="text" placeholder="Ej: Formulario licencia federativa 2026" value={newLicencia.title} onChange={(e) => setNewLicencia({ ...newLicencia, title: e.target.value })} /></div><div className="d-field"><label>Enlace del PDF</label><input type="url" placeholder="https://drive.google.com/file/d/..." value={newLicencia.pdfUrl} onChange={(e) => setNewLicencia({ ...newLicencia, pdfUrl: e.target.value })} /></div></div><button className="d-btn" onClick={addLicencia}>📤 Añadir Documento</button></div>
-            <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "32px 0 16px" }}>DOCUMENTOS DE LICENCIAS ({licencias.length})</h3>
-            {licencias.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay documentos de licencias todavía.</p>}
-            {licencias.map(l => (<div key={l.id} className="d-list-item"><div className="d-list-info"><h4>📋 {l.title}</h4><p style={{ fontSize: 11, wordBreak: "break-all" }}>{l.pdfUrl}</p></div><div style={{ display: "flex", gap: 8 }}><a href={l.pdfUrl} target="_blank" rel="noreferrer" className="d-btn d-btn-sm d-btn-ghost" style={{ textDecoration: "none" }}>Ver PDF</a><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteLicencia(l)}>Eliminar</button></div></div>))}
-          </>)}
-
-          {/* ── INSCRIPCIONES TAB ── */}
-          {tab === "inscripciones" && (<>
-            <div className="d-title">INSCRIPCIONES</div><div className="d-subtitle">Solicitudes de inscripción recibidas desde el formulario web</div>
-            <div style={{ display: "flex", gap: 10, marginBottom: 24 }}><button className="d-btn" onClick={exportInscripcionesCSV} disabled={inscripciones.length === 0}>📊 Exportar Excel (CSV)</button><span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", alignSelf: "center" }}>{inscripciones.length} inscripciones pendientes</span></div>
-            {inscripciones.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay inscripciones pendientes.</p>}
-            {inscripciones.map(ins => (<div key={ins.id} className="d-card" style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}><div><h3 style={{ marginBottom: 4 }}>{ins.nombre} {ins.apellidos}</h3><p style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>{ins.fechaNacimiento} · DNI: {ins.dni} · {ins.tipoCuota}</p></div><div style={{ display: "flex", gap: 8 }}><button className="d-btn d-btn-sm" onClick={() => aprobarInscripcion(ins)}>✅ Aprobar y añadir</button><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteInscripcion(ins)}>Eliminar</button></div></div><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "8px 24px", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,.45)" }}><div><strong style={{ color: "rgba(255,255,255,.6)" }}>Email:</strong> {ins.email}</div><div><strong style={{ color: "rgba(255,255,255,.6)" }}>Móvil:</strong> {ins.movil}</div><div><strong style={{ color: "rgba(255,255,255,.6)" }}>Dirección:</strong> {ins.direccion}</div><div><strong style={{ color: "rgba(255,255,255,.6)" }}>Cuenta:</strong> {ins.numeroCuenta || "—"}</div><div><strong style={{ color: "rgba(255,255,255,.6)" }}>Pago:</strong> {ins.formaPago}</div><div><strong style={{ color: "rgba(255,255,255,.6)" }}>Apto físico:</strong> {ins.aptoFisico}</div>{ins.redes && <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Redes:</strong> {ins.redes}</div>}{ins.menorDatos && <div><strong style={{ color: "rgba(255,255,255,.6)" }}>Tutor (menor):</strong> {ins.menorDatos}</div>}</div></div>))}
-          </>)}
-
-          {/* ── MENSAJES TAB ── */}
-          {tab === "mensajes" && (<>
-            <div className="d-title">MENSAJES DE CONTACTO</div><div className="d-subtitle">Mensajes recibidos desde el formulario de contacto de la web</div>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", marginBottom: 24, display: "block" }}>{mensajes.length} mensaje{mensajes.length !== 1 ? "s" : ""} recibido{mensajes.length !== 1 ? "s" : ""}</span>
-            {mensajes.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14 }}>No hay mensajes todavía.</p>}
-            {mensajes.map(m => (<div key={m.id} className="d-card" style={{ marginBottom: 12 }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}><div><h3 style={{ marginBottom: 4 }}>{m.nombre}</h3><p style={{ fontSize: 12, color: "rgba(255,255,255,.35)" }}>{m.email}{m.movil ? ` · ${m.movil}` : ""}{m.asunto ? ` · ${m.asunto}` : ""}</p></div><div style={{ display: "flex", gap: 8 }}><a href={`mailto:${m.email}?subject=Re: ${encodeURIComponent(m.asunto || "Consulta Transtriatlon")}&body=${encodeURIComponent(`Hola ${m.nombre},\n\nGracias por contactar con Transtriatlon.\n\n---\nTu mensaje:\n${m.mensaje}\n`)}`} className="d-btn d-btn-sm" style={{ textDecoration: "none" }}>✉️ Responder</a><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteMensaje(m)}>Eliminar</button></div></div><div style={{ marginTop: 14, padding: 16, borderRadius: 8, background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.05)", fontSize: 14, color: "rgba(255,255,255,.6)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{m.mensaje}</div></div>))}
-          </>)}
-
-          {/* ── ATLETAS TAB ── */}
-          {tab === "atletas" && (<>
-            <div className="d-title">LISTA DE ATLETAS</div><div className="d-subtitle">Todos los atletas registrados en Transtriatlon</div>
-            <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
-              <button className="d-btn" onClick={exportAtletasCSV} disabled={atletas.length === 0}>📊 Exportar Excel (CSV)</button>
-              <button className="d-btn d-btn-ghost" onClick={() => { setShowAddAtleta(!showAddAtleta); if (editingAtleta) cancelEditAtleta(); }}>{showAddAtleta ? "✕ Cerrar" : "➕ Añadir Atleta"}</button>
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.3)", alignSelf: "center" }}>{atletas.length} atletas registrados</span>
-            </div>
-            {showAddAtleta && (<div className="d-card" style={{ marginBottom: 24, borderColor: editingAtleta ? "var(--red)" : undefined }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}><h3>{editingAtleta ? "✏️ EDITANDO ATLETA" : "AÑADIR ATLETA"}</h3>{editingAtleta && <button className="d-btn d-btn-sm d-btn-ghost" onClick={cancelEditAtleta}>Cancelar</button>}</div>
-              <div className="d-row"><div className="d-field"><label>Nombre</label><input type="text" value={newAtleta.nombre} onChange={(e) => setNewAtleta({...newAtleta, nombre: e.target.value})} /></div><div className="d-field"><label>Apellidos</label><input type="text" value={newAtleta.apellidos} onChange={(e) => setNewAtleta({...newAtleta, apellidos: e.target.value})} /></div></div>
-              <div className="d-row"><div className="d-field"><label>Fecha nacimiento</label><input type="date" value={newAtleta.fechaNacimiento} onChange={(e) => setNewAtleta({...newAtleta, fechaNacimiento: e.target.value})} /></div><div className="d-field"><label>DNI</label><input type="text" value={newAtleta.dni} onChange={(e) => setNewAtleta({...newAtleta, dni: e.target.value})} /></div></div>
-              <div className="d-field"><label>Dirección</label><input type="text" value={newAtleta.direccion} onChange={(e) => setNewAtleta({...newAtleta, direccion: e.target.value})} /></div>
-              <div className="d-row"><div className="d-field"><label>Email</label><input type="email" value={newAtleta.email} onChange={(e) => setNewAtleta({...newAtleta, email: e.target.value})} /></div><div className="d-field"><label>Móvil</label><input type="tel" value={newAtleta.movil} onChange={(e) => setNewAtleta({...newAtleta, movil: e.target.value})} /></div></div>
-              <div className="d-row"><div className="d-field"><label>Número de cuenta</label><input type="text" value={newAtleta.numeroCuenta} onChange={(e) => setNewAtleta({...newAtleta, numeroCuenta: e.target.value})} /></div><div className="d-field"><label>Tipo de cuota</label><input type="text" value={newAtleta.tipoCuota} onChange={(e) => setNewAtleta({...newAtleta, tipoCuota: e.target.value})} placeholder="Ej: 4 ACTIVIDADES ADULTO" /></div></div>
-              <button className="d-btn" onClick={saveAtleta}>{editingAtleta ? "💾 Guardar Cambios" : "👤 Añadir Atleta"}</button>
-            </div>)}
-            <h3 style={{ fontFamily: "var(--display)", fontSize: 22, letterSpacing: 1, margin: "16px 0 16px" }}>ATLETAS REGISTRADOS ({atletas.length})</h3>
-            <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}><thead><tr>{["Nombre","Apellidos","F. Nac.","DNI","Email","Móvil","Cuota","Pago","",""].map((h,i) => (<th key={h+i} style={{ textAlign: "left", padding: "10px 8px", borderBottom: "1px solid rgba(255,255,255,.08)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.3)", whiteSpace: "nowrap" }}>{h}</th>))}</tr></thead><tbody>{atletas.map(a => (<tr key={a.id} style={{ borderBottom: "1px solid rgba(255,255,255,.04)" }}><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.7)" }}>{a.nombre}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.7)" }}>{a.apellidos}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{a.fechaNacimiento}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.dni}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.email}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", whiteSpace: "nowrap" }}>{a.movil}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)", fontSize: 11 }}>{a.tipoCuota}</td><td style={{ padding: "10px 8px", color: "rgba(255,255,255,.4)" }}>{a.formaPago}</td><td style={{ padding: "10px 8px" }}><button className="d-btn d-btn-sm d-btn-ghost" onClick={() => startEditAtleta(a)}>✏️</button></td><td style={{ padding: "10px 8px" }}><button className="d-btn d-btn-sm d-btn-danger" onClick={() => deleteAtleta(a)}>✕</button></td></tr>))}</tbody></table></div>
-            {atletas.length === 0 && <p style={{ color: "rgba(255,255,255,.3)", fontSize: 14, marginTop: 16 }}>No hay atletas registrados todavía.</p>}
-          </>)}
-
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
