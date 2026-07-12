@@ -205,7 +205,7 @@ export default function Home() {
         if (!snap.empty) {
           const mapped = snap.docs.map(d => {
             const data = d.data();
-            return { title: data.title, date: data.date, type: data.type, img: data.imgUrl || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop", inscripcionUrl: data.inscripcionUrl || "", popup: data.popup || false };
+            return { title: data.title, date: data.date, type: data.type, img: data.imgUrl || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop", inscripcionUrl: data.inscripcionUrl || "", resultadosUrl: data.resultadosUrl || "", popup: data.popup || false };
           });
           setEvents(mapped);
           const today = new Date().toISOString().slice(0, 10);
@@ -541,6 +541,7 @@ a{text-decoration:none;color:inherit}
                 <Link to="/eventos" style={{ textDecoration: "none", color: "inherit" }}>
                   <div className="ev-card">
                     <img src={e.img} alt={e.title} />
+                    {e.resultadosUrl && <div style={{ position: "absolute", top: 12, right: 12, zIndex: 3, padding: "5px 14px", borderRadius: 100, background: "#0a8a0a", color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", boxShadow: "0 2px 8px rgba(0,0,0,.3)" }}>📊 Resultados</div>}
                     <div className="ev-info">
                       <div className="ev-type">{e.type}</div>
                       <h3>{e.title}</h3>
