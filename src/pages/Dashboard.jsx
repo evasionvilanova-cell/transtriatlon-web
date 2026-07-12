@@ -34,7 +34,7 @@ export default function Dashboard() {
 
   // Events state
   const [events, setEvents] = useState([]);
-  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosUrl2: "", imagenesUrl: "", popup: false });
+  const [newEvent, setNewEvent] = useState({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosNombre: "", resultadosUrl2: "", resultadosNombre2: "", imagenesUrl: "", popup: false });
   const [editingEvent, setEditingEvent] = useState(null);
 
   // Ritmos state
@@ -159,18 +159,18 @@ export default function Dashboard() {
     try {
       if (editingEvent) { await setDoc(doc(db, "events", editingEvent.id), newEvent); setEditingEvent(null); setMsg("✅ Evento actualizado!"); }
       else { await addDoc(collection(db, "events"), newEvent); setMsg("✅ Evento añadido!"); }
-      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosUrl2: "", imagenesUrl: "", popup: false });
+      setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosNombre: "", resultadosUrl2: "", resultadosNombre2: "", imagenesUrl: "", popup: false });
       loadEvents();
     } catch (e) { setMsg("Error: " + e.message); }
   };
 
   const startEditEvent = (ev) => {
     setEditingEvent(ev);
-    setNewEvent({ title: ev.title || "", date: ev.date || "", type: ev.type || "Triatlón", imgUrl: ev.imgUrl || "", description: ev.description || "", reglamentoUrl: ev.reglamentoUrl || "", inscripcionUrl: ev.inscripcionUrl || "", resultadosUrl: ev.resultadosUrl || "", resultadosUrl2: ev.resultadosUrl2 || "", imagenesUrl: ev.imagenesUrl || "", popup: ev.popup || false });
+    setNewEvent({ title: ev.title || "", date: ev.date || "", type: ev.type || "Triatlón", imgUrl: ev.imgUrl || "", description: ev.description || "", reglamentoUrl: ev.reglamentoUrl || "", inscripcionUrl: ev.inscripcionUrl || "", resultadosUrl: ev.resultadosUrl || "", resultadosNombre: ev.resultadosNombre || "", resultadosUrl2: ev.resultadosUrl2 || "", resultadosNombre2: ev.resultadosNombre2 || "", imagenesUrl: ev.imagenesUrl || "", popup: ev.popup || false });
     setMsg("Editando: " + ev.title); window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const cancelEdit = () => { setEditingEvent(null); setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosUrl2: "", imagenesUrl: "", popup: false }); setMsg(""); };
+  const cancelEdit = () => { setEditingEvent(null); setNewEvent({ title: "", date: "", type: "Triatlón", imgUrl: "", description: "", reglamentoUrl: "", inscripcionUrl: "", resultadosUrl: "", resultadosNombre: "", resultadosUrl2: "", resultadosNombre2: "", imagenesUrl: "", popup: false }); setMsg(""); };
 
   const deleteEvent = async (ev) => {
     if (!confirm(`¿Eliminar "${ev.title}"?`)) return;
@@ -388,7 +388,8 @@ export default function Dashboard() {
               </div>
               <div className="d-field"><label>Descripción del evento</label><textarea value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} placeholder="Recorrido, categorías, horarios, info relevante..." style={{ minHeight: 100 }} /></div>
               <div className="d-row"><div className="d-field"><label>Enlace reglamento (PDF / Google Drive)</label><input type="url" value={newEvent.reglamentoUrl} onChange={(e) => setNewEvent({ ...newEvent, reglamentoUrl: e.target.value })} placeholder="https://drive.google.com/..." /></div><div className="d-field"><label>Enlace inscripción al evento</label><input type="url" value={newEvent.inscripcionUrl} onChange={(e) => setNewEvent({ ...newEvent, inscripcionUrl: e.target.value })} placeholder="https://..." /></div></div>
-              <div className="d-row"><div className="d-field"><label>Enlace resultados 1 (URL o PDF Google Drive)</label><input type="url" value={newEvent.resultadosUrl} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl: e.target.value })} placeholder="https://..." /></div><div className="d-field"><label>Enlace resultados 2 (opcional)</label><input type="url" value={newEvent.resultadosUrl2} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl2: e.target.value })} placeholder="https://... (segundo PDF si lo hay)" /></div></div>
+              <div className="d-row"><div className="d-field"><label>Enlace resultados 1 (URL o PDF Google Drive)</label><input type="url" value={newEvent.resultadosUrl} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl: e.target.value })} placeholder="https://..." /></div><div className="d-field"><label>Nombre resultados 1 (opcional)</label><input type="text" value={newEvent.resultadosNombre} onChange={(e) => setNewEvent({ ...newEvent, resultadosNombre: e.target.value })} placeholder="Ej: Clasificación General" /></div></div>
+              <div className="d-row"><div className="d-field"><label>Enlace resultados 2 (opcional)</label><input type="url" value={newEvent.resultadosUrl2} onChange={(e) => setNewEvent({ ...newEvent, resultadosUrl2: e.target.value })} placeholder="https://... (segundo PDF si lo hay)" /></div><div className="d-field"><label>Nombre resultados 2 (opcional)</label><input type="text" value={newEvent.resultadosNombre2} onChange={(e) => setNewEvent({ ...newEvent, resultadosNombre2: e.target.value })} placeholder="Ej: Clasificación por Categorías" /></div></div>
               <div className="d-field"><label>Enlace galería de imágenes del evento</label><input type="url" value={newEvent.imagenesUrl} onChange={(e) => setNewEvent({ ...newEvent, imagenesUrl: e.target.value })} placeholder="https://photos.google.com/... o enlace al álbum" /></div>
               <div className="d-field" style={{ flexDirection: "row", alignItems: "center", gap: 10 }}><input type="checkbox" id="popupChk" checked={newEvent.popup} onChange={(e) => setNewEvent({ ...newEvent, popup: e.target.checked })} style={{ width: 18, height: 18, accentColor: "var(--red)", flex: "0 0 auto" }} /><label htmlFor="popupChk" style={{ margin: 0, cursor: "pointer" }}>🔔 Mostrar como pop-up al abrir la web (recordatorio con botón de inscripción)</label></div>
             <button className="d-btn" onClick={saveEvent}>{editingEvent ? "💾 Guardar Cambios" : "➕ Añadir Evento"}</button>
