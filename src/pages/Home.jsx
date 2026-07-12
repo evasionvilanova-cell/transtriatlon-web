@@ -190,6 +190,7 @@ export default function Home() {
   const [tarifaTab, setTarifaTab] = useState("adulto");
   const [events, setEvents] = useState(EVENTS_DEFAULT);
   const [popupEvents, setPopupEvents] = useState([]);
+  const [popupResultados, setPopupResultados] = useState([]);
 
   useEffect(() => {
     const loadBanner = async () => {
@@ -205,7 +206,7 @@ export default function Home() {
         if (!snap.empty) {
           const mapped = snap.docs.map(d => {
             const data = d.data();
-            return { title: data.title, date: data.date, type: data.type, img: data.imgUrl || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop", inscripcionUrl: data.inscripcionUrl || "", resultadosUrl: data.resultadosUrl || "", popup: data.popup || false };
+            return { title: data.title, date: data.date, type: data.type, img: data.imgUrl || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop", inscripcionUrl: data.inscripcionUrl || "", resultadosUrl: data.resultadosUrl || "", resultadosNombre: data.resultadosNombre || "", resultadosUrl2: data.resultadosUrl2 || "", resultadosNombre2: data.resultadosNombre2 || "", popup: data.popup || false, popupResultados: data.popupResultados || false };
           });
           setEvents(mapped);
           const today = new Date().toISOString().slice(0, 10);
@@ -214,6 +215,10 @@ export default function Home() {
             const upcomingMarked = marked.filter(e => e.date >= today);
             const chosen = (upcomingMarked.length ? upcomingMarked : marked).slice(0, 3);
             if (chosen.length) setPopupEvents(chosen);
+          }
+          if (localStorage.getItem("tt-popup-res-date") !== today) {
+            const resMarked = mapped.filter(e => e.popupResultados && e.resultadosUrl);
+            if (resMarked.length) setPopupResultados(resMarked.slice(0, 3));
           }
         }
       } catch (e) { /* use defaults */ }
@@ -240,6 +245,7 @@ export default function Home() {
   };
 
   const closePopup = () => { localStorage.setItem("tt-popup-date", new Date().toISOString().slice(0, 10)); setPopupEvents([]); };
+  const closePopupResultados = () => { localStorage.setItem("tt-popup-res-date", new Date().toISOString().slice(0, 10)); setPopupResultados([]); };
 
   return (
     <div>
@@ -263,6 +269,35 @@ export default function Home() {
                       {ev.inscripcionUrl
                         ? <a href={ev.inscripcionUrl} target="_blank" rel="noopener noreferrer" onClick={closePopup} style={{ display: "block", textAlign: "center", background: "var(--red)", color: "#fff", padding: 12, borderRadius: "var(--rs)", textDecoration: "none", fontWeight: 700, letterSpacing: .3 }}>¡Inscríbete!</a>
                         : <div style={{ textAlign: "center", color: "var(--text2)", fontSize: 13 }}>Inscripciones próximamente</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+      {popupResultados.length > 0 && popupEvents.length === 0 && (
+        <div onClick={closePopupResultados} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--bg)", borderRadius: "var(--r)", maxWidth: 440, width: "100%", maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(0,0,0,.5)", position: "relative" }}>
+            <button onClick={closePopupResultados} aria-label="Cerrar" style={{ position: "absolute", top: 12, right: 12, zIndex: 3, width: 34, height: 34, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.45)", color: "#fff", fontSize: 22, cursor: "pointer", lineHeight: 1 }}>×</button>
+            <div style={{ padding: "20px 26px 6px" }}>
+              <div style={{ fontFamily: "var(--display)", color: "#0a8a0a", letterSpacing: 1, fontSize: 15 }}>📊 ¡RESULTADOS DISPONIBLES!</div>
+              {popupResultados.length > 1 && <p style={{ color: "var(--text2)", fontSize: 13, marginTop: 4 }}>Consulta los resultados de las últimas pruebas</p>}
+            </div>
+            <div style={{ padding: "8px 18px 22px", display: "flex", flexDirection: "column", gap: 14 }}>
+              {popupResultados.map((ev, i) => {
+                const single = popupResultados.length === 1;
+                return (
+                  <div key={ev.title + i} style={{ borderRadius: "var(--r)", overflow: "hidden", border: "1px solid rgba(0,0,0,.08)", background: "#fff" }}>
+                    {ev.img && <img src={ev.img} alt="" style={{ width: "100%", height: single ? 170 : 120, objectFit: "cover", display: "block" }} />}
+                    <div style={{ padding: single ? "18px 20px 20px" : "14px 16px 16px" }}>
+                      <h3 style={{ fontFamily: "var(--display)", fontSize: single ? 30 : 22, letterSpacing: .5, margin: "0 0 6px", color: "var(--dark)" }}>{ev.title}</h3>
+                      <p style={{ color: "var(--text2)", fontSize: 13, marginBottom: 14 }}>{formatDate(ev.date)} · {ev.type}</p>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <a href={ev.resultadosUrl} target="_blank" rel="noopener noreferrer" onClick={closePopupResultados} style={{ display: "block", textAlign: "center", background: "#0a8a0a", color: "#fff", padding: 12, borderRadius: "var(--rs)", textDecoration: "none", fontWeight: 700, letterSpacing: .3 }}>📊 {ev.resultadosNombre || "Ver Resultados"}</a>
+                        {ev.resultadosUrl2 && <a href={ev.resultadosUrl2} target="_blank" rel="noopener noreferrer" onClick={closePopupResultados} style={{ display: "block", textAlign: "center", background: "#0a8a0a", color: "#fff", padding: 12, borderRadius: "var(--rs)", textDecoration: "none", fontWeight: 700, letterSpacing: .3 }}>📊 {ev.resultadosNombre2 || "Ver Resultados (2)"}</a>}
+                      </div>
                     </div>
                   </div>
                 );
