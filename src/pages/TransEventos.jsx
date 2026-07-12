@@ -121,6 +121,7 @@ export default function TransEventos() {
                         <div className="te-card-img">
                           <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
                           <div className="te-card-type">{ev.type}</div>
+                          {ev.resultadosUrl && <div style={{ position: "absolute", top: 12, right: 12, padding: "5px 14px", borderRadius: 100, background: "#0a8a0a", color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", boxShadow: "0 2px 8px rgba(0,0,0,.3)" }}>📊 RESULTADOS</div>}
                         </div>
                         <div className="te-card-body">
                           <h3>{ev.title}</h3>
@@ -142,7 +143,7 @@ export default function TransEventos() {
                         <div className="te-card-img">
                           <img src={ev.imgUrl || DEFAULT_IMG} alt={ev.title} />
                           <div className="te-card-type" style={{ background: "#666" }}>{ev.type}</div>
-                          {ev.resultadosUrl && <div style={{ position: "absolute", bottom: 12, right: 12, padding: "4px 12px", borderRadius: 100, background: "#fff", color: "var(--text)", fontSize: 10, fontWeight: 700, letterSpacing: 1 }}>📊 RESULTADOS</div>}
+                          {ev.resultadosUrl && <div style={{ position: "absolute", top: 12, right: 12, padding: "5px 14px", borderRadius: 100, background: "#0a8a0a", color: "#fff", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", boxShadow: "0 2px 8px rgba(0,0,0,.3)" }}>📊 RESULTADOS</div>}
                         </div>
                         <div className="te-card-body">
                           <h3>{ev.title}</h3>
