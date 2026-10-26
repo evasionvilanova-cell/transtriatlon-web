@@ -29,7 +29,7 @@ const SCHEDULES = [
     sessions: [
       { day: "Lunes", time: "19:45h", activity: "Carrera a pie", place: "Pistas de atletismo de Vilanova i la Geltrú" },
       { day: "Martes", time: "19:30h", activity: "Natación en mar", place: "Playa Vilanova i la Geltrú (temporada)" },
-      { day: "Martes", time: "20:15h / 20:45h", activity: "Natación", place: "Piscina municipal de Vilanova i la Geltrú" },
+      { day: "Martes", time: "19:30h / 20:30h", activity: "Natación", place: "Parc del Garraf o Piscina municipal de Vilanova i la Geltrú" },
       { day: "Miércoles", time: "19:45h", activity: "Carrera a pie", place: "Pistas de atletismo de Vilanova i la Geltrú" },
       { day: "Jueves", time: "19:45h", activity: "Ciclismo", place: "Circuito ciclismo Vilanova i la Geltrú" },
     ],
